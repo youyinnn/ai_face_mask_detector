@@ -3,3 +3,8 @@
 *.jpeg
 
 .DS_Store
+
+__pycache__
+
+*.7z
+*.zip

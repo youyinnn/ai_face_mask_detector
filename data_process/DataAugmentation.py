@@ -1,5 +1,5 @@
 import os
-from ImageDataset import label_map
+from DatasetHelper import label_map
 import random
 from pathlib import Path
 import shutil
@@ -21,7 +21,7 @@ def randon_transform(img):
     return transforms(img)
 
 
-def aug(img_root_dir, single_class_len=500):
+def aug(img_root_dir, single_class_len=500, train_set_proportion=0.8):
 
     img_root_dir_path = Path(img_root_dir)
     img_root_dir_parent_path = img_root_dir_path.parent.absolute()
@@ -36,7 +36,12 @@ def aug(img_root_dir, single_class_len=500):
         class_original_dir = os.path.join(img_root_dir, label_name)
         class_aug_dir = os.path.join(img_root_dir_parent_path,
                                      f'aug_{aug_count}', label_name)
+        class_aug_train_dir = os.path.join(class_aug_dir, 'train')
+        class_aug_test_dir = os.path.join(class_aug_dir, 'test')
+
         os.mkdir(class_aug_dir)
+        os.mkdir(class_aug_train_dir)
+        os.mkdir(class_aug_test_dir)
 
         img_file_names = os.listdir(class_original_dir)
         original_dataset_len = len(img_file_names)
@@ -87,8 +92,24 @@ def aug(img_root_dir, single_class_len=500):
             shutil.copyfile(os.path.join(class_original_dir, img_file_name), os.path.join(
                 class_aug_dir, img_file_name))
 
+        aug_img_file_names = [name for name in os.listdir(
+            class_aug_dir) if name not in ['train', 'test']]
+        random.shuffle(aug_img_file_names)
+
+        i = 0
+        aug_img_train_count = 0
+        while i < single_class_len:
+            dst_dir = class_aug_train_dir if aug_img_train_count < int(
+                round(single_class_len * train_set_proportion, 0)) else class_aug_test_dir
+
+            shutil.move(os.path.join(class_aug_dir, aug_img_file_names[i]),
+                        os.path.join(dst_dir, aug_img_file_names[i]))
+
+            aug_img_train_count += 1
+            i += 1
+
         label += 1
 
 
-aug('/Users/yinnnyou/workspace/ai_face_mask_detector/data/resized',
-    single_class_len=1000)
+# aug('/Users/yinnnyou/workspace/ai_face_mask_detector/data/resized',
+#     single_class_len=1000)
