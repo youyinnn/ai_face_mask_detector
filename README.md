@@ -33,7 +33,11 @@ Accuracy:
 
 Reference:
 
-Dataset: https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
+
+Dataset:
+Now using:https://drive.google.com/drive/folders/1B9oVTjYrd7YsIzFzWNkCYO3srLJt0Z7Y
+(Datasource)
+https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
 
 author: Wobot Intelligence
 
@@ -42,5 +46,7 @@ license:CC0: Public Domain
 https://www.kaggle.com/datasets/andrewmvd/face-mask-detection/metadata
 
 https://makeml.app/datasets/mask
+
+
 
 
