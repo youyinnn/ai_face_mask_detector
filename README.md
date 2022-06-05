@@ -6,19 +6,23 @@ Team members:Alexander Fulleringer, Jun Huang, Cheng Chen
 
 ID numbers: Alexander Fulleringer, Jun Huang, 40222770
 
-Dataset: https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
-
+Dataset: 
+(Datasource)
+https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
 author: Wobot Intelligence
-
 license:CC0: Public Domain 
+all images in class cloth_mask, class no_mask, class surgical_mask, 000001.jpg~000096.jpg in class n95
 
-https://www.kaggle.com/datasets/andrewmvd/face-mask-detection/metadata
+https://www.kaggle.com/datasets/vijaykumar1799/face-mask-detection
+author: Wvijay kumar
+license:CC0: Public Domain 
+all images in class mask_worn_incorrectly
 
-https://makeml.app/datasets/mask
+https://www.kaggle.com/datasets/coffee124/facemaskn95
+author: coffee124
+license:CC0: Public Domain 
+000097.jpg~000387.jpg 
 
-author: Larxel
-
-license:CC0: Public Domain
 
 CNN Architecture:(By Alexander)
 
@@ -36,17 +40,22 @@ Reference:
 
 Dataset:
 Now using:https://drive.google.com/drive/folders/1B9oVTjYrd7YsIzFzWNkCYO3srLJt0Z7Y
+
 (Datasource)
 https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
-
 author: Wobot Intelligence
-
 license:CC0: Public Domain 
+all images in class cloth_mask, class no_mask, class surgical_mask, 000001.jpg~000096.jpg in class n95
 
-https://www.kaggle.com/datasets/andrewmvd/face-mask-detection/metadata
+https://www.kaggle.com/datasets/vijaykumar1799/face-mask-detection
+author: Wvijay kumar
+license:CC0: Public Domain 
+all images in class mask_worn_incorrectly
 
-https://makeml.app/datasets/mask
-
+https://www.kaggle.com/datasets/coffee124/facemaskn95
+author: coffee124
+license:CC0: Public Domain 
+000097.jpg~000387.jpg 
 
 
 
