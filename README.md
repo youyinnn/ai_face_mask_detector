@@ -36,6 +36,7 @@ Accuracy:
 (All above are based on test data)
 
 Reference:
+PyTorch API:https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split
 
 
 Dataset:
