@@ -12,9 +12,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 # unzip the augmented dataset and load it
-training_data = ImageDataset('./data/aug_0')
+training_data = ImageDataset('/Users/sonjack/Downloads/aug_1/')
 print()
-testing_data = ImageDataset('./data/aug_0', train=False)
+testing_data = ImageDataset('/Users/sonjack/Downloads/aug_1/', train=False)
 
 batch_size = 40
 
