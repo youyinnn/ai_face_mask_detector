@@ -1,4 +1,5 @@
 ### AI Face Mask Detector
+Latex Online Site:https://www.overleaf.com/project/629d23fca51a5722ec9d3557
 
 Team name:OB_13
 
@@ -36,6 +37,7 @@ Accuracy:
 (All above are based on test data)
 
 Reference:
+PyTorch API:https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split
 
 
 Dataset:
