@@ -1,4 +1,5 @@
 ### AI Face Mask Detector
+Latex Online Site:https://www.overleaf.com/project/629d23fca51a5722ec9d3557
 
 Team name:OB_13
 
@@ -36,11 +37,12 @@ Accuracy:
 (All above are based on test data)
 
 Reference:
+PyTorch API:https://pytorch.org/docs/stable/data.html#torch.utils.data.random_split
 
 
 Dataset:
-Now using:https://drive.google.com/drive/folders/1B9oVTjYrd7YsIzFzWNkCYO3srLJt0Z7Y
-
+Now using:(before)https://drive.google.com/drive/folders/1B9oVTjYrd7YsIzFzWNkCYO3srLJt0Z7Y
+(after)https://drive.google.com/file/d/1-mhCw6ovURDwvl857LfBLlKB69KrK96M/view
 (Datasource)
 https://www.kaggle.com/datasets/wobotintelligence/face-mask-detection-dataset/metadata
 author: Wobot Intelligence

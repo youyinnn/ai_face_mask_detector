@@ -16,15 +16,15 @@ label_map = {
 
 class ImageDataset(Dataset):
 
-    def __init__(self, img_root_dir, train=True, transform=None, target_transform=None):
+    def __init__(self, img_root_dir, transform=None, target_transform=None):
         # self.img_labels = pd.read_csv(annotations_file)
         label = 0
         all_img_file_names = []
         all_img_labels = []
 
         for label, label_name in label_map.items():
-            class_dir_ls = os.listdir(os.path.join(
-                img_root_dir, label_name, 'train' if train else 'test'))
+            class_dir_ls = [img for img in os.listdir(os.path.join(
+                img_root_dir, label_name)) if img.endswith('.jpeg')]
 
             labels = [label] * len(class_dir_ls)
 
@@ -44,7 +44,6 @@ class ImageDataset(Dataset):
         self.img_root_dir = img_root_dir
         self.transform = transform
         self.target_transform = target_transform
-        self.train = train
 
     def __len__(self):
         return len(self.img_labels)
@@ -52,7 +51,7 @@ class ImageDataset(Dataset):
     def __getitem__(self, idx):
         label = self.img_labels.iloc[idx, 1]
         img_path = os.path.join(
-            self.img_root_dir, label_map[label], 'train' if self.train else 'test', self.img_labels.iloc[idx, 0])
+            self.img_root_dir, label_map[label], self.img_labels.iloc[idx, 0])
         image = read_image(img_path)
         if self.transform:
             image = self.transform(image)
