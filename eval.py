@@ -2,4 +2,4 @@
 
 
 print(123)
-print()
+print(3434)
