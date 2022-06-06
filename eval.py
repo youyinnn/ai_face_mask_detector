@@ -1,7 +1,7 @@
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
-# 绘制混淆矩阵
+# draw a confusion matrix
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
     """
     - cm :  calculate the value of the confusion matrix
