@@ -8,3 +8,5 @@ __pycache__
 
 *.7z
 *.zip
+
+*.pth
