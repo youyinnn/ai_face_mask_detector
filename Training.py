@@ -28,7 +28,7 @@ else:
 #
 # data_y = functions.one_hot(data_y)
 # print(data_X.shape, data_y.shape)
-def train_net(model,splits = 5, num_epochs = 50, pretrained_model = None):
+def train_net(model,splits = 5, num_epochs = 50, pretrained_model = None, lr = 1e-3):
     if pretrained_model:
         #TODO implement loading a model
         return
@@ -41,11 +41,11 @@ def train_net(model,splits = 5, num_epochs = 50, pretrained_model = None):
     print("Training data shape:", X_train_val.shape)
     print("Training targets shape:", y_train_val.shape)
 
-    accs = kfold_cross_validation(Models.LinearNet(), X, X_train_val, num_epochs, splits, y, y_train_val)
+    accs = kfold_cross_validation(Models.LinearNet(), X, X_train_val, num_epochs, splits, y, y_train_val, lr)
     print(accs)
 
 # Performs a kfold cross validation on a copy of the passed architecture
-def kfold_cross_validation(base_model, X, X_train_val, num_epochs, splits, y, y_train_val):
+def kfold_cross_validation(base_model, X, X_train_val, num_epochs, splits, y, y_train_val, lr):
     # Now use training data to perform 5-fold cross validation
     # This will be used to tune hyper parameters and architecture
     # Stratified K-fold ensures balanced class representation
@@ -59,9 +59,11 @@ def kfold_cross_validation(base_model, X, X_train_val, num_epochs, splits, y, y_
         X_train, X_val = X[train_index], X[val_index]
         y_train, y_val = y[train_index], y[val_index]
         kfold_dataset = TensorDataset(X_train, y_train)
-        data_loader = torch.utils.data.DataLoader(kfold_dataset, batch_size=128, shuffle=True)
-        trained_model = train_model(model_to_train, data_loader, num_epochs=num_epochs)
-        accuracies[i] = test_model(trained_model, X_val, y_val)
+        data_loader = torch.utils.data.DataLoader(kfold_dataset, batch_size=256, shuffle=True)
+        trained_model = train_model(model_to_train, data_loader, num_epochs=num_epochs,lr=lr)
+        acc = test_model(trained_model, X_val, y_val)
+        accuracies[i] = acc
+        print('Fold accuracy: ', acc)
         # print(accuracies[i])
         i = i + 1
     return accuracies
@@ -70,11 +72,11 @@ def kfold_cross_validation(base_model, X, X_train_val, num_epochs, splits, y, y_
 def test_model(model, X, y):
     X = X.to(device)
     y = y.to(device)
-    print("y_val shape:", y.shape)
+    #print("y_val shape:", y.shape)
     y_pred = model(X).to(device)
-    print("First 5 predictions and actual values, then accuracy")
-    print(y_pred[0:5], y[0:5])
-    print (sklearn.metrics.accuracy_score(y[0:5].argmax(dim=1).cpu().detach().numpy(), y_pred[0:5].argmax(dim=1).cpu().detach().numpy()) )
+    #print("First 5 predictions and actual values, then accuracy")
+    #print(y_pred[0:5], y[0:5])
+    #print (sklearn.metrics.accuracy_score(y[0:5].argmax(dim=1).cpu().detach().numpy(), y_pred[0:5].argmax(dim=1).cpu().detach().numpy()) )
     accuracy = sklearn.metrics.accuracy_score(y.argmax(dim=1).cpu().detach().numpy(), y_pred.argmax(dim=1).cpu().detach().numpy())
     return accuracy
 
@@ -93,7 +95,7 @@ def get_all_data():
 
     return data_X, data_y
 
-def train_model(model, data_loader, num_epochs=50, lr=1e-4,):
+def train_model(model, data_loader, num_epochs=50, lr=5e-4,):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     for epoch in range(num_epochs):
@@ -103,7 +105,6 @@ def train_model(model, data_loader, num_epochs=50, lr=1e-4,):
             data = data.to(device)
             target = target.to(device)
             optimizer.zero_grad()
-
             y_pred = model(data).to(device)
             #print(target)
             #print(y_pred)
@@ -114,7 +115,10 @@ def train_model(model, data_loader, num_epochs=50, lr=1e-4,):
 
 
 #train_net(model,data_loader)
+def hyper_param_tuning():
 
-train_net(Models.LinearNet(), num_epochs=50)
+    train_net(Models.Base_CNN(), splits=5, num_epochs=50, lr=1e-3)
+
+hyper_param_tuning()
 
 
