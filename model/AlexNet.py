@@ -211,18 +211,18 @@ def load(variant=None, loadkws={}):
 
     model_f1 = net_class()
     model_f1.load_state_dict(torch.load(os.path.join(
-        os.getcwd(), './alex_net', net_name, f'alex_{net_name}_f1.pth'), **loadkws))
+        os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f1.pth'), **loadkws))
     model_f2 = net_class()
     model_f2.load_state_dict(torch.load(os.path.join(
-        os.getcwd(), './alex_net', net_name, f'alex_{net_name}_f2.pth'), **loadkws))
+        os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f2.pth'), **loadkws))
     model_f3 = net_class()
     model_f3.load_state_dict(torch.load(os.path.join(
-        os.getcwd(), './alex_net', net_name, f'alex_{net_name}_f3.pth'), **loadkws))
+        os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f3.pth'), **loadkws))
     model_f4 = net_class()
     model_f4.load_state_dict(torch.load(os.path.join(
-        os.getcwd(), './alex_net', net_name, f'alex_{net_name}_f4.pth'), **loadkws))
+        os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f4.pth'), **loadkws))
     model_f5 = net_class()
     model_f5.load_state_dict(torch.load(os.path.join(
-        os.getcwd(), './alex_net', net_name, f'alex_{net_name}_f5.pth'), **loadkws))
+        os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f5.pth'), **loadkws))
 
     return model_f1, model_f2, model_f3, model_f4, model_f5
