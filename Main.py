@@ -1,8 +1,7 @@
-
-
 import Models
 import Validation
 import Training
 
-model = Models.LinearNet
-Training.train_net(model)
+
+
+# Training.train_net(Models.Base_CNN)
