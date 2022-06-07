@@ -205,6 +205,8 @@ class CompositeAlexNet(nn.Module):
         for i, fold in enumerate(self.composite):
             self.composite[i] = fold.cuda()
 
+        return self
+
     # def predict
 
 
@@ -231,4 +233,4 @@ def load(variant=None, loadkws={}):
     model_f5.load_state_dict(torch.load(os.path.join(
         os.getcwd(), 'model/alex_net', net_name, f'alex_{net_name}_f5.pth'), **loadkws))
 
-    return model_f1, model_f2, model_f3, model_f4, model_f5
+    return [model_f1, model_f2, model_f3, model_f4, model_f5]
