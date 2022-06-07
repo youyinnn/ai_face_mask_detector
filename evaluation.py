@@ -27,7 +27,7 @@ def evaluate(test_loader, model, output_label_match_fn,
         all_targets = np.append(all_targets, targets.argmax(dim=1).cpu().detach().numpy())
 
     acc = accuracy_score(all_outputs, all_targets)
-    print("acc", acc)
+    # print("acc", acc)
     pre = precision_score(all_outputs, all_targets, average=pre_average)
     rec = recall_score(all_outputs, all_targets, average=rec_average)
     f1 = f1_score(all_outputs, all_targets, average=f1_average)

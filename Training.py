@@ -1,4 +1,6 @@
 import copy
+
+import numpy as np
 import torchvision.transforms as T
 
 import torch
@@ -47,8 +49,10 @@ def train_net(model,tuning = False, splits = 5, num_epochs = 50, lr = 1e-3, batc
     else:
     # After tuning, train on entire train/validation set before testing on the test set
         final_train_dataset = TensorDataset(X_train_val, y_train_val)
-        data_loader = torch.utils.data.DataLoader(final_train_dataset, batch_size=64, shuffle=True)
-        trained_model = train_model(model().to(device), data_loader,)
+        data_loader = torch.utils.data.DataLoader(final_train_dataset,num_epochs = num_epochs, batch_size=64, shuffle=True)
+        trained_model = train_model(model().to(device), data_loader,
+                                    x_val=X_test, y_val=y_test,
+                                    track_training=True)
         print("Test accuracy: ", test_model(trained_model, X_test, y_test))
         return trained_model
 
@@ -112,9 +116,9 @@ def get_all_data():
 
     return data_X, data_y
 
-def train_model(model, data_loader, num_epochs=50, lr=1e-4,):
-
+def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4, track_training = False):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    all_metrics = np.zeros((num_epochs,4))
     for epoch in range(num_epochs):
         if epoch % 5 == 0:
             print(f'Starting Epoch {epoch+1} of {num_epochs}')
@@ -128,6 +132,11 @@ def train_model(model, data_loader, num_epochs=50, lr=1e-4,):
             loss = functions.binary_cross_entropy_with_logits(y_pred, target.float())
             loss.backward()
             optimizer.step()
+        if track_training:
+            metrics = eval_model(model,x_val,y_val)
+            all_metrics[epoch] = np.array((metrics['acc'], metrics['pre'], metrics['rec'],metrics['f1']))
+    if track_training:
+        np.save('Metrics_Tracking', all_metrics)
     return model
 
 # Performs the hyperparameter tuning using random search.
@@ -155,4 +164,4 @@ def eval_model(model, x,y):
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return evaluation.evaluate(test_loader, model, output_to_label)
 
-trained_net = train_net(Models.Base_CNN, tuning=True, splits=5, num_epochs=50, lr=1e-4, batch_size=128)
+train_net(Models.Base_CNN, tuning=False, splits=5, num_epochs=3, lr=1e-4, batch_size=128)
