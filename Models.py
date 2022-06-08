@@ -8,7 +8,6 @@ from torchvision.transforms import ToTensor
 import torchvision.transforms as T
 
 
-
 # A basic LinearNet to be used as a baseline and for debugging
 class LinearNet(torch.nn.Module):
     def __init__(self, num_layers=2, layer_width=100):
@@ -16,7 +15,8 @@ class LinearNet(torch.nn.Module):
         self.layers = nn.ModuleList()
         self.layers += [nn.LazyLinear(layer_width), nn.ReLU(inplace=True)]
         for i in range(num_layers):
-            self.layers += [nn.Linear(layer_width, layer_width), nn.ReLU(inplace=True)]
+            self.layers += [nn.Linear(layer_width,
+                                      layer_width), nn.ReLU(inplace=True)]
         #self.layers += [nn.LazyLinear(64), nn.ReLU(inplace=True)]
         self.task_head = nn.Linear(layer_width, 5)
         self.softmax = nn.Softmax(dim=1)
@@ -31,15 +31,18 @@ class LinearNet(torch.nn.Module):
         #x = self.softmax(x)
         return x
 
+
 class Big_CNN(torch.nn.Module):
     def __init__(self):
         super(Big_CNN, self).__init__()
         self.layers = nn.ModuleList()
         self.layers += [nn.Conv2d(3, 48, kernel_size=7), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(48, 72, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(48, 72, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(72, 72, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(72, 72, kernel_size=3),
+                        nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
         #self.layers += [nn.Conv2d(72, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
@@ -50,7 +53,7 @@ class Big_CNN(torch.nn.Module):
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
-        N,C,H,W = x.shape
+        N, C, H, W = x.shape
         #x = x.reshape(x.shape[0], x.shape[1], -1)
         # x = self.layers[0](x)
         #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
@@ -63,23 +66,30 @@ class Big_CNN(torch.nn.Module):
         return x
 
 # A recreation of the famous AlexNet
+
+
 class AlexNet(nn.Module):
     def __init__(self):
         super(AlexNet, self).__init__()
         # 227 * 227 * 3
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=96, kernel_size=11, stride=4, padding=0)
+        self.conv1 = nn.Conv2d(
+            in_channels=3, out_channels=96, kernel_size=11, stride=4, padding=0)
         # 55 * 55 * 96
         self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2)
         # 27 * 27 * 96
-        self.conv2 = nn.Conv2d(in_channels=96, out_channels=256, kernel_size=5, stride=1, padding=2)
+        self.conv2 = nn.Conv2d(
+            in_channels=96, out_channels=256, kernel_size=5, stride=1, padding=2)
         # 27 * 27 * 256
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2)
         # 13 * 13 * 256
-        self.conv3 = nn.Conv2d(in_channels=256, out_channels=384, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(
+            in_channels=256, out_channels=384, kernel_size=3, stride=1, padding=1)
         # 13 * 13 * 384
-        self.conv4 = nn.Conv2d(in_channels=384, out_channels=384, kernel_size=3, stride=1, padding=1)
+        self.conv4 = nn.Conv2d(
+            in_channels=384, out_channels=384, kernel_size=3, stride=1, padding=1)
         # 13 * 13 * 384
-        self.conv5 = nn.Conv2d(in_channels=384, out_channels=256, kernel_size=3, stride=1, padding=1)
+        self.conv5 = nn.Conv2d(
+            in_channels=384, out_channels=256, kernel_size=3, stride=1, padding=1)
         # 13 * 13 * 256
         self.maxpool3 = nn.MaxPool2d(kernel_size=3, stride=2)
         # 6 * 6 * 256
@@ -111,6 +121,8 @@ class AlexNet(nn.Module):
         return x
 
 # Accuracy ~66%
+
+
 class Base_CNN(torch.nn.Module):
     def __init__(self):
         super(Base_CNN, self).__init__()
@@ -119,17 +131,23 @@ class Base_CNN(torch.nn.Module):
         self.layers = nn.ModuleList()
         self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
         # self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(6, 12, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
-        self.layers += [nn.Conv2d(24, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(12, 24, kernel_size=3),
+                        nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(24, 48, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
 
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
-        self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(192, 192, kernel_size=3),
+                        nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.linear1 = nn.LazyLinear(256)
         self.linear2 = nn.Linear(256, 256)
@@ -137,7 +155,7 @@ class Base_CNN(torch.nn.Module):
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
-        N,C,H,W = x.shape
+        N, C, H, W = x.shape
         #x = x.reshape(x.shape[0], x.shape[1], -1)
         # x = self.layers[0](x)
         #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
@@ -149,6 +167,7 @@ class Base_CNN(torch.nn.Module):
         x = self.fc(x)
         # x = torch.softmax(x,dim=1)
         return x
+
 
 class Less_Pooling_CNN(torch.nn.Module):
     def __init__(self):
@@ -157,17 +176,23 @@ class Less_Pooling_CNN(torch.nn.Module):
         self.layers = nn.ModuleList()
         self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
         # self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(6, 12, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
-        self.layers += [nn.Conv2d(24, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(12, 24, kernel_size=3),
+                        nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(24, 48, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
 
         #self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
-        self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(192, 192, kernel_size=3),
+                        nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.linear1 = nn.LazyLinear(256)
         self.linear2 = nn.Linear(256, 256)
@@ -175,7 +200,7 @@ class Less_Pooling_CNN(torch.nn.Module):
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
-        N,C,H,W = x.shape
+        N, C, H, W = x.shape
         #x = x.reshape(x.shape[0], x.shape[1], -1)
         # x = self.layers[0](x)
         #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
@@ -187,6 +212,7 @@ class Less_Pooling_CNN(torch.nn.Module):
         x = self.fc(x)
         # x = torch.softmax(x,dim=1)
         return x
+
 
 class Less_Conv_CNN(torch.nn.Module):
     def __init__(self):
@@ -199,12 +225,15 @@ class Less_Conv_CNN(torch.nn.Module):
         #self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
         #self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
-        self.layers += [nn.Conv2d(6, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(6, 48, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
 
         self.layers += [nn.MaxPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
@@ -214,7 +243,7 @@ class Less_Conv_CNN(torch.nn.Module):
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
-        N,C,H,W = x.shape
+        N, C, H, W = x.shape
         #x = x.reshape(x.shape[0], x.shape[1], -1)
         # x = self.layers[0](x)
         #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
@@ -227,30 +256,37 @@ class Less_Conv_CNN(torch.nn.Module):
         # x = torch.softmax(x,dim=1)
         return x
 # a basic CNN
+
+
 class Chen_CNN(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()
+        super(Chen_CNN, self).__init__()
         self.conv_layer = nn.Sequential(
 
-            nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=3, out_channels=32,
+                      kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(inplace=True),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=32, out_channels=32,
+                      kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=32, out_channels=64,
+                      kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(inplace=True),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=64, out_channels=64,
+                      kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
 
         self.fc_layer = nn.Sequential(nn.Dropout(p=0.1), nn.Linear(64 * 64 * 64, 1000), nn.ReLU(inplace=True),
-                                  nn.Linear(1000, 512), nn.ReLU(inplace=True), nn.Dropout(p=0.1), nn.Linear(512, 10)
-                                  )
+                                      nn.Linear(1000, 512), nn.ReLU(
+                                          inplace=True), nn.Dropout(p=0.1), nn.Linear(512, 10)
+                                      )
 
     def forward(self, x):
 
