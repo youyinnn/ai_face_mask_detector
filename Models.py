@@ -226,7 +226,7 @@ class Less_Conv_CNN(torch.nn.Module):
         x = self.fc(x)
         # x = torch.softmax(x,dim=1)
         return x
-
+# a basic CNN
 class Chen_CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
