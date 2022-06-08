@@ -12,7 +12,7 @@ def evaluate(test_loader, model, output_label_match_fn,
              pre_average='macro', rec_average='macro', f1_average='macro'):
     all_outputs = np.empty([0])
     all_targets = np.empty([0])
-
+    model.eval()
     for i, (items, targets) in enumerate(test_loader):
         #items = Variable(items)
         #classes = Variable(classes)

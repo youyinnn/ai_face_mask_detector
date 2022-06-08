@@ -36,17 +36,16 @@ class Big_CNN(torch.nn.Module):
         super(Big_CNN, self).__init__()
         self.layers = nn.ModuleList()
         self.layers += [nn.Conv2d(3, 48, kernel_size=7), nn.ReLU(inplace=True)]
-        self.layers += [nn.AvgPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
-        self.layers += [nn.AvgPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(96, 96, kernel_size=3), nn.ReLU(inplace=True)]
-        self.layers += [nn.AvgPool2d(2, stride=1)]
-        self.layers += [nn.Conv2d(96, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
-
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(48, 72, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(72, 72, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        #self.layers += [nn.Conv2d(72, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.linear1 = nn.LazyLinear(256)
-        #self.linear2 = nn.Linear(512, 256)
+        self.linear2 = nn.Linear(256, 256)
         # self.layers += [nn.LazyLinear(32), nn.ReLU(inplace=True)]
         self.fc = nn.LazyLinear(5)
 
@@ -115,18 +114,25 @@ class AlexNet(nn.Module):
 class Base_CNN(torch.nn.Module):
     def __init__(self):
         super(Base_CNN, self).__init__()
+
+        self.name = "Base_CNN"
         self.layers = nn.ModuleList()
         self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
-        self.layers += [nn.AvgPool2d(2, stride=1)]
+        # self.layers += [nn.MaxPool2d(2, stride=1)]
         self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
-        self.layers += [nn.AvgPool2d(2, stride=1)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
         self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
         self.layers += [nn.Conv2d(24, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
 
-        #self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
         #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.linear1 = nn.LazyLinear(256)
-        #self.linear2 = nn.Linear(512, 256)
+        self.linear2 = nn.Linear(256, 256)
         # self.layers += [nn.LazyLinear(32), nn.ReLU(inplace=True)]
         self.fc = nn.LazyLinear(5)
 
@@ -139,6 +145,84 @@ class Base_CNN(torch.nn.Module):
             x = self.layers[i](x)
         x = x.view(N, -1)
         x = self.linear1(x)
+        x = self.linear2(x)
+        x = self.fc(x)
+        # x = torch.softmax(x,dim=1)
+        return x
+
+class Less_Pooling_CNN(torch.nn.Module):
+    def __init__(self):
+        self.name = "Less_Pooling"
+        super(Less_Pooling_CNN, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
+        # self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(24, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+
+        #self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.linear1 = nn.LazyLinear(256)
+        self.linear2 = nn.Linear(256, 256)
+        # self.layers += [nn.LazyLinear(32), nn.ReLU(inplace=True)]
+        self.fc = nn.LazyLinear(5)
+
+    def forward(self, x):
+        N,C,H,W = x.shape
+        #x = x.reshape(x.shape[0], x.shape[1], -1)
+        # x = self.layers[0](x)
+        #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
+        for i in range(0, len(self.layers)):
+            x = self.layers[i](x)
+        x = x.view(N, -1)
+        x = self.linear1(x)
+        x = self.linear2(x)
+        x = self.fc(x)
+        # x = torch.softmax(x,dim=1)
+        return x
+
+class Less_Conv_CNN(torch.nn.Module):
+    def __init__(self):
+        super(Less_Conv_CNN, self).__init__()
+
+        self.name = "Less_Conv"
+        self.layers = nn.ModuleList()
+        self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
+        #self.layers += [nn.MaxPool2d(2, stride=1)]
+        #self.layers += [nn.Conv2d(6, 12, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        #self.layers += [nn.Conv2d(12, 24, kernel_size=3), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(6, 48, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(48, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(192, 192, kernel_size=3), nn.ReLU(inplace=True)]
+        #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+        self.linear1 = nn.LazyLinear(256)
+        self.linear2 = nn.Linear(256, 256)
+        # self.layers += [nn.LazyLinear(32), nn.ReLU(inplace=True)]
+        self.fc = nn.LazyLinear(5)
+
+    def forward(self, x):
+        N,C,H,W = x.shape
+        #x = x.reshape(x.shape[0], x.shape[1], -1)
+        # x = self.layers[0](x)
+        #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
+        for i in range(0, len(self.layers)):
+            x = self.layers[i](x)
+        x = x.view(N, -1)
+        x = self.linear1(x)
+        x = self.linear2(x)
         x = self.fc(x)
         # x = torch.softmax(x,dim=1)
         return x
