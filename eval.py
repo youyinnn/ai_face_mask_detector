@@ -1,6 +1,7 @@
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 # draw a confusion matrix
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
@@ -35,6 +36,14 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label')
     plt.show()
 #test data, can be edited according to the result in fact
+#here we use a as sample tensor
+a  = np.array([[3.0212e-09, 5.1222e-08, 4.1752e-05, 9.9849e-01, 1.4634e-03],
+        [1.2625e-06, 2.0127e-05, 2.4095e-02, 9.2246e-01, 5.3423e-02],
+        [5.0156e-11, 3.1125e-10, 1.0847e-05, 9.9998e-01, 1.2953e-05],
+        [1.1720e-06, 2.7668e-07, 7.3066e-01, 2.4161e-01, 2.7734e-02],
+        [4.5282e-09, 8.6848e-06, 3.2957e-04, 9.5855e-01, 4.1109e-02],
+        [3.9356e-08, 8.0953e-06, 3.1157e-03, 8.8281e-01, 1.1406e-01]])
+
 
 cnf_matrix = np.array([[187,2,1,5,5],
                       [12,176,2,7,3],
@@ -59,9 +68,11 @@ mask_worn_incorrectly=cnf_matrix[4]
 
 #for convinience , I use the specific number here. It will be changed later
 #For cloth_mask
-precision1=187/(187+12+0+6+1)
-accuracy=(187+176+198+173+186)/1000
-recall1=187/(187+2+1+5+5)
+accuracy=( np.diag(cnf_matrix).sum() )/cnf_matrix.sum()
+ColSum=cnf_matrix.sum(axis=0)
+RowSum=cnf_matrix.sum(axis=0)
+precision1=cloth_mask[0]/ColSum[0]
+recall1=cloth_mask[0]/RowSum[0]
 fm1=2*(precision1*recall1)/(precision1+recall1)
 print("accuracy: ",accuracy)
 print("\n\n\n\n\n\n")
@@ -69,29 +80,29 @@ print("precision 1: ",precision1)
 print("recall 1: ",recall1)
 print("fm 1: ",fm1)
 #For No_face_mask
-precision2=176/(2+176+0+5+3)
-recall2=176/(12+176+2+7+3)
+precision2=No_face_mask[1]/ColSum[1]
+recall2=No_face_mask[1]/RowSum[1]
 fm2=2*(precision2*recall2)/(precision2+recall2)
 print("precision 2: ",precision2)
 print("recall 2: ",recall2)
 print("fm 2: ",fm2)
 #For Surgical_mask
-precision3=198/(1+2+198+4+1)
-recall3=198/(0+0+198+2+0)
+precision3=Surgical_mask[2]/ColSum[2]
+recall3=Surgical_mask[2]/RowSum[2]
 fm3=2*(precision3*recall3)/(precision3+recall3)
 print("precision 3: ",precision3)
 print("recall 3: ",recall3)
 print("fm 3: ",fm3)
 #For K95_Mask
-precision4=173/(5+7+2+173+9)
-recall4=173/(6+5+4+173+12)
+precision4=K95_mask[3]/ColSum[3]
+recall4=K95_mask[3]/RowSum[3]
 fm4=2*(precision4*recall4)/(precision4+recall4)
 print("precision 4: ",precision4)
 print("recall 4: ",recall4)
 print("fm 4: ",fm4)
 #For mask_worn_incorrectly
-precision5=186/(5+3+0+12+186)
-recall5=186/(1+3+1+9+186)
+precision5=mask_worn_incorrectly[4]/ColSum[4]
+recall5=mask_worn_incorrectly[4]/RowSum[4]
 fm5=2*(precision5*recall5)/(precision5+recall5)
 print("precision 5: ",precision5)
 print("recall 5: ",recall5)
