@@ -114,7 +114,7 @@ def test_model(model, X, y):
 def get_all_data(resize = 128):
     # Size set to 128 to prevent memory issues
     transform_train = T.Compose([T.Resize((resize, resize))])
-    data = ImageDataset('./dataset', transform = transform_train)
+    data = ImageDataset('./aug_1/', transform = transform_train)
     # model = Models.LinearNet()
     # Using a batch size larger than the dataset means all data is retrieved in one loop iteration
     # Stretch goal: Make this work on arbitrarily large datasets by stacking the tensors in the data_loader

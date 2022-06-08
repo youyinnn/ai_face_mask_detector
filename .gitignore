@@ -10,3 +10,12 @@ __pycache__
 *.zip
 
 *.pth
+
+*.aux
+*.fls
+*.log
+*.out
+doc/output/main.synctex.gz
+*.fdb_latexmk
+
+.idea

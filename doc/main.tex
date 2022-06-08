@@ -1,0 +1,194 @@
+
+\documentclass[stu, floatsintext, 10pt, donotrepeattitle, natbib]{apa7}
+\usepackage[utf8]{inputenc}
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+% Times New Roman
+\usepackage{mathptmx}
+
+\usepackage{import}
+
+\usepackage{subfig}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+% \usepackage{stfloats}
+
+\definecolor{black}{rgb}{0, 0, 0}
+\definecolor{arsenic}{rgb}{0.23, 0.27, 0.29}
+\definecolor{cadet}{rgb}{0.33, 0.41, 0.47}
+
+\hypersetup{
+	colorlinks,
+	breaklinks,
+    urlcolor=cadet,
+    linkcolor=cadet,
+    citecolor=cadet
+}
+
+% table center the p
+\usepackage{array}
+
+\usepackage{amsmath}
+\usepackage{csquotes}
+
+\usepackage{listings}
+
+\usepackage{lipsum}
+\usepackage{setspace}
+
+\renewcommand{\baselinestretch}{1.7} 
+
+\title{AI Face Mask Detector Phase 1 Report}
+\author{
+    Alexander Fulleringer (40005290) \textit{Training Specialist}, \\
+    Cheng Chen (40222770) \textit{Evaluation Specialist}, \\
+    Jun Huang (40168167) \textit{Data Specialist}
+}
+\authorsaffiliations{{Team: OB\_13}}
+\course{COMP 6721 Applied Artificial Intelligence}
+\professor{Dr. René Witte}
+\duedate{June 8th, 2022}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+
+	\section{Abstract}
+
+	This is the project report of AI Face Mask Detector.
+	Alexander Fulleringer works as the Training Specialist, Jun Huang works as the Evaluation Specialist, and Cheng Chen works as Data Specialist.
+	We use a dataset of 5,000 pictures with 1000 pictures in every class as required.
+	Our task is to build a convolutional neural network that can correctly classify images, and evaluate its learning metrics.
+	Beyond accuracy, we look at precision, recall, and the f-measure.
+
+	Our full sources files are in our github repo:\href{https://github.com/youyinnn/ai_face_mask_detector}{youyinnn/ai\_face\_mask\_detector}
+
+\end{abstract}
+
+\newpage
+\section{Dataset}
+
+For the dataset of our model, we collect 2,390 images for five different \textit{types} of people with or without masks.
+Since we need a balanced dataset on each \textit{type}, we apply five image transformation strategies for data augmentation after we preprocessed all the images.
+Table \ref{tb:ds} shows the overall information of our dataset.
+
+\begin{table}[!ht]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{Size and Source of Each Type in the Dataset}
+	\centering
+	\begin{tabular}{ >{\centering\arraybackslash}p{0.2cm} >{\centering\arraybackslash}p{3.5cm} >{\centering\arraybackslash}p{2.5cm} >{\centering\arraybackslash}p{2.5cm} | >{\centering\arraybackslash}p{5.7cm} }
+		\hline
+		  & \bfseries Type        & \bfseries Size before Augmentation & \bfseries Size after Augmentation & \bfseries Source    \\
+		\hline
+		0 & Cloth Mask            & 418                                & 1,000                             & \cite{_2020_face_w} \\
+		1 & No Face Mask          & 1,006                              & 1,000                             & \cite{_2020_face_w} \\
+		2 & Surgical Mask         & 411                                & 1,000                             & \cite{_2020_face_w} \\
+		3 & N95 Mask              & 387                                & 1,000                             & Image Search Engine \\
+		4 & Mask Worn Incorrectly & 168                                & 1,000                             & Image Search Engine \\
+		\hline
+		  &                       & 2,390                              & 5,000                             & \bfseries Total     \\
+		\hline
+	\end{tabular}
+	\label{tb:ds}
+\end{table}
+
+\subsection{Data Collection}
+
+For data type \enquote{Cloth Mask}, \enquote{No Face Mask} and \enquote{Surgical Mask}, data are collected from the public dataset \cite[Face Mask Detection]{_2020_face_w}.
+For data type \enquote{N95 Mask} and \enquote{Mask Worn Incorrectly}, data are collected manually from several image search engines such as \textit{Google}, \textit{Bing}, \textit{Yahoo} etc.
+If we consider 400 images for each type of the data, then the previous four types have balanced size, but the data of \enquote{Mask Worn Incorrectly} has half size of the others.
+For that, we consider not using any techniques to generate synthetic data as we think it might mislead the model performance.
+We randomly apply multiple augmentation strategies to obtain a dataset with a balanced size for each type.
+
+% All data in our dataset is collected from \href{https://www.overleaf.com/learn}{Kaggle}.
+% The specific data sources are listed in the References section.
+% In the beginning, pictures in our dataset have the resolution ranging from 128x128 to over 1080x1080. For making them easy to fit in our CNN train model, we turn all of them into 256x256 resolution after discussing.
+% Besides, Since class 4 (N95) and class 3(Surgical mask) don't have enough sources with a specific label on \href{https://www.overleaf.com/learn}{Kaggle}. We had to manually select some photos from other dataset.
+
+\subsection{Data Preprocessing}
+
+% What's more, after finishing the first setup of our dataset. We found that 2,000 (500 in testing class, 1,500 in training class) are a little fewer for our training model. Therefore, we collected more data and made a bigger dataset, with 5,000 pictures, all in 256 x 256 resolution and keeping a balanced number in every class.
+% Besides, there are kinds of label strategy like using a csv file with pictures' name. This time in our project, we use five different folders with their class' name tagged on instead of a label csv file.
+% For a better training effect. Except following the requirement(train/test-split), we divided our dataset with an extra validation set to enforce our effect.
+
+To input the data right away to the net for training and testing, we crop the data into a 1:1 resolution ratio and make the human face locate at the center of the image as much as possible.
+And then we resize all the data into $256 \times 256$ resolution.
+
+\newpage
+\section{CNN Architecture}
+
+\subsection{Title1}
+
+
+\subsection{Title2}
+
+\begin{table}
+	\centering
+	\begin{tabular}{l|r}
+		Item    & Quantity \\\hline
+		Widgets & 42       \\
+		Gadgets & 13
+	\end{tabular}
+	\caption{\label{tab:widgets}An example table.}
+\end{table}
+
+\newpage
+
+
+\section{Evaluation}
+\subsection{Original Version}
+\begin{itemize}
+	\item Precision:
+	\item Accuracy:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item Recall:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item F-Measure:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+\end{itemize}
+\subsection{Confusion Matrix}
+
+\subsection{Version 1(Removing/Adding pooling layers)}
+\begin{itemize}
+	\item Precision:
+	\item Accuracy:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item Recall:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item F-Measure:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+\end{itemize}
+
+\subsection{Confusion Matrix}
+\subsection{Version 2(Change convolutional layers' number)}
+\begin{itemize}
+	\item Precision:
+	\item Accuracy:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item Recall:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+	\item F-Measure:Class 1: , Class 2: , Class 3: , Class 4: , Class 5: .
+\end{itemize}
+
+\subsection{Confusion Matrix}
+
+\subsection{Statement}
+According to the three results above, we can see that xxxx has the biggest impact. We can see\\
+In the second phase. We decide to do more normalization on our dataset, and then use other training/test-split methods like other types of k-fold to make the improvements.
+
+\cite[]{greenwade93}
+
+\newpage
+
+
+% \begin{thebibliography}{9}
+
+% 	\bibitem{texbook}
+% 	[3]  COFFEE124 (2022) \emph{N95 Face Mask}, Version 1, CC0: Public Domain, https://www.kaggle.com/datasets/coffee124/facemaskn95, All N95 Class images.
+
+% \end{thebibliography}
+
+\newpage
+\renewcommand\refname{\textbf{References}}
+\bibliography{ref}
+
+\end{document}
