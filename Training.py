@@ -51,7 +51,6 @@ def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epoc
         final_train_dataset = TensorDataset(X_train_val, y_train_val)
         data_loader = torch.utils.data.DataLoader(final_train_dataset, batch_size=128, shuffle=True)
         if load_path:
-
             trained_model = load_model(model_type, load_path).to(device)
         else:
             trained_model = train_model(model_type().to(device), data_loader,
@@ -60,7 +59,7 @@ def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epoc
                                         track_training=True)
         print("Test accuracy: ", test_model(trained_model, X_test, y_test))
         metrics = eval_model(trained_model, X_test, y_test)
-        print("Final Metrics:", metrics)
+        print("Final Report:", metrics['report'])
         np.save('Final_Test_Metrics' + trained_model.name, metrics)
         return trained_model
 
@@ -84,10 +83,11 @@ def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_
         trained_model = train_model(model_to_train, data_loader,
                                     x_val=X_val, y_val=y_val,
                                     num_epochs=num_epochs, lr=lr)
-        print(eval_model(trained_model,X_val,y_val))
+        print("Evaluation metrics for this fold:")
+        print(eval_model(trained_model,X_val,y_val)['report'])
         acc = test_model(trained_model, X_val, y_val)
         accuracies[i] = acc
-        print('Fold accuracy: ', acc)
+        # print('Fold accuracy: ', acc)
         # print(accuracies[i])
         i = i + 1
     return accuracies
@@ -114,7 +114,7 @@ def test_model(model, X, y):
 def get_all_data(resize = 128):
     # Size set to 128 to prevent memory issues
     transform_train = T.Compose([T.Resize((resize, resize))])
-    data = ImageDataset('./aug_1/', transform = transform_train)
+    data = ImageDataset('./aug_1/', transform=transform_train)
     # model = Models.LinearNet()
     # Using a batch size larger than the dataset means all data is retrieved in one loop iteration
     # Stretch goal: Make this work on arbitrarily large datasets by stacking the tensors in the data_loader
@@ -155,13 +155,13 @@ def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4
 
 # Performs the hyperparameter tuning using random search.
 # Learning Rate and Num_Epochs used for an example
-def hyper_parameter_tuning(model, n_trials):
+def hyper_parameter_tuning(model_type, n_trials):
     lrs = torch.randint(low=1, high=20, size=(n_trials,)) * (1e-4)
     num_epochs = torch.randint(low=25, high=50, size=(n_trials,))
     mean_accs = [0]*n_trials
     for i,(lr,epochs) in enumerate(zip(lrs,num_epochs)):
         print(f'lr = {lr}, epochs = {epochs}')
-        accs = train_net(model, tuning=True, lr=lr, num_epochs=epochs)
+        accs = train_net(model_type, tuning=True, lr=lr, num_epochs=epochs)
         mean_accs[i] = sum(accs)/5
     print(lrs)
     print(num_epochs)
@@ -202,14 +202,14 @@ def load_and_run_model(model_type,PATH):
     train_net(model_type, tuning=False, load_path=PATH)
 
 
-train_final_model(Models.Base_CNN, 'Final_Model',)
+#train_final_model(Models.Base_CNN, 'Final_Model',)
 
-load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
+#load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
 
 #train_final_model(Models.Less_Conv_CNN, 'Final_Model',)
 
-load_and_run_model(Models.Less_Conv_CNN, 'Final_Model_Less_Conv')
+#load_and_run_model(Models.Less_Conv_CNN, 'Final_Model_Less_Conv')
 
 #train_final_model(Models.Less_Pooling_CNN, 'Final_Model',)
 
-load_and_run_model(Models.Less_Pooling_CNN, 'Final_Model_Less_Pooling')
+#load_and_run_model(Models.Less_Pooling_CNN, 'Final_Model_Less_Pooling')
