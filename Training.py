@@ -16,13 +16,13 @@ from torch.utils.data import DataLoader, TensorDataset
 from data_process.DatasetHelper import label_map
 from data_process.DatasetHelper import ImageDataset
 import matplotlib.pyplot as plt
-
 if torch.cuda.is_available():
-    #print("Using GPU!")
+    print("Using GPU!")
     device = 'cuda'
 else:
-    #print("Using CPU :(")
+    print("Using CPU :(")
     device = 'cpu'
+
 # unzip the augmented dataset and load it
 # data = ImageDataset('./dataset')
 # #model = Models.LinearNet()
@@ -32,7 +32,7 @@ else:
 #
 # data_y = functions.one_hot(data_y)
 # print(data_X.shape, data_y.shape)
-def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128):
+def train_net(model,tuning = False, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128):
 
     # Split data into TEST and TRAIN
     # Do not touch test until eval time
@@ -44,29 +44,21 @@ def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epoc
     print("Training targets shape:", y_train_val.shape)
     if tuning:
     #Perform K-fold cross validation. This is used for tuning our model
-        accs = kfold_cross_validation(model_type, X_train_val, num_epochs, splits, y_train_val, lr, batch_size = batch_size)
-        return accs
+        accs = kfold_cross_validation(model, X_train_val, num_epochs, splits, y_train_val, lr, batch_size = batch_size)
+        print(accs)
     else:
     # After tuning, train on entire train/validation set before testing on the test set
         final_train_dataset = TensorDataset(X_train_val, y_train_val)
-        data_loader = torch.utils.data.DataLoader(final_train_dataset, batch_size=128, shuffle=True)
-        if load_path:
-
-            trained_model = load_model(model_type, load_path).to(device)
-        else:
-            trained_model = train_model(model_type().to(device), data_loader,
-                                        x_val=X_test, y_val=y_test,
-                                        num_epochs=num_epochs,
-                                        track_training=True)
+        data_loader = torch.utils.data.DataLoader(final_train_dataset,num_epochs = num_epochs, batch_size=64, shuffle=True)
+        trained_model = train_model(model().to(device), data_loader,
+                                    x_val=X_test, y_val=y_test,
+                                    track_training=True)
         print("Test accuracy: ", test_model(trained_model, X_test, y_test))
-        metrics = eval_model(trained_model, X_test, y_test)
-        print("Final Metrics:", metrics)
-        np.save('Final_Test_Metrics' + trained_model.name, metrics)
         return trained_model
 
 
 # Performs a kfold cross validation on a copy of the passed architecture
-def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_val, lr, batch_size=128):
+def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_val, lr, batch_size = 128):
     # Now use training data to perform 5-fold cross validation
     # This will be used to tune hyper parameters and architecture
     # Stratified K-fold ensures balanced class representation
@@ -81,9 +73,7 @@ def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_
         y_train, y_val = y_train_val[train_index], y_train_val[val_index]
         kfold_dataset = TensorDataset(X_train, y_train)
         data_loader = torch.utils.data.DataLoader(kfold_dataset, batch_size=batch_size, shuffle=True)
-        trained_model = train_model(model_to_train, data_loader,
-                                    x_val=X_val, y_val=y_val,
-                                    num_epochs=num_epochs, lr=lr)
+        trained_model = train_model(model_to_train, data_loader, num_epochs=num_epochs,lr=lr)
         print(eval_model(trained_model,X_val,y_val))
         acc = test_model(trained_model, X_val, y_val)
         accuracies[i] = acc
@@ -111,14 +101,17 @@ def test_model(model, X, y):
     return overall_accuracy/total_samples
 
 # retrieve the entire dataset and returns 2 tensors, 1 data and 1 targets
-def get_all_data(resize = 128):
-    # Size set to 128 to prevent memory issues
-    transform_train = T.Compose([T.Resize((resize, resize))])
+def get_all_data():
+<<<<<<< Updated upstream
+    transform_train = T.Compose([T.Resize((128,128))])
     data = ImageDataset('./dataset', transform = transform_train)
+=======
+    data = ImageDataset('/Users/sonjack/Downloads/aug_1')
+>>>>>>> Stashed changes
     # model = Models.LinearNet()
     # Using a batch size larger than the dataset means all data is retrieved in one loop iteration
     # Stretch goal: Make this work on arbitrarily large datasets by stacking the tensors in the data_loader
-    data_loader = torch.utils.data.DataLoader(data, batch_size=10000, shuffle=False)
+    data_loader = torch.utils.data.DataLoader(data, batch_size=10000, shuffle=True)
     for data, labels in data_loader:
         data_X, data_y = data.float(), labels
 
@@ -130,7 +123,6 @@ def get_all_data(resize = 128):
 def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4, track_training = False):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     all_metrics = np.zeros((num_epochs,4))
-    model.train()
     for epoch in range(num_epochs):
         if epoch % 5 == 0:
             print(f'Starting Epoch {epoch+1} of {num_epochs}')
@@ -144,72 +136,36 @@ def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4
             loss = functions.binary_cross_entropy_with_logits(y_pred, target.float())
             loss.backward()
             optimizer.step()
-        #last_acc = test_model(model,x_val,y_val)
-        #print(f"Epoch {epoch} accuracy: {last_acc*100}%")
         if track_training:
             metrics = eval_model(model,x_val,y_val)
             all_metrics[epoch] = np.array((metrics['acc'], metrics['pre'], metrics['rec'],metrics['f1']))
     if track_training:
-        np.save('Metrics_Tracking_'+model.name, all_metrics)
+        np.save('Metrics_Tracking', all_metrics)
     return model
 
 # Performs the hyperparameter tuning using random search.
 # Learning Rate and Num_Epochs used for an example
 def hyper_parameter_tuning(model, n_trials):
-    lrs = torch.randint(low=1, high=20, size=(n_trials,)) * (1e-4)
-    num_epochs = torch.randint(low=25, high=50, size=(n_trials,))
+    lrs = torch.randint(low=1,high=20, size=(n_trials,)) * (1e-4)
+    num_epochs = torch.randint(low=25, high=100, size=(n_trials,))
     mean_accs = [0]*n_trials
     for i,(lr,epochs) in enumerate(zip(lrs,num_epochs)):
         print(f'lr = {lr}, epochs = {epochs}')
-        accs = train_net(model, tuning=True, lr=lr, num_epochs=epochs)
+        accs = train_net(model,tuning = True, lr=lr, num_epochs=epochs)
         mean_accs[i] = sum(accs)/5
     print(lrs)
     print(num_epochs)
     print(mean_accs)
 
-# Helper method to get predictions from model output
+#hyper_parameter_tuning(Models.Base_CNN,1)
 def output_to_label(output):
     print(output)
     rs = output.argmax(axis=1)
   # [1,2,3,100,1] -> 3
     return rs
-
-# Get evaluation metrics on a trained model given a test set
 def eval_model(model, x,y):
     test_data = TensorDataset(x, y)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return evaluation.evaluate(test_loader, model, output_to_label)
-#hyper_parameter_tuning(Models.Base_CNN,3)
-#accs = train_net(Models.Base_CNN, tuning=True, splits=5, num_epochs=50, lr=1e-4, batch_size=128)
-#print("Accuracies: ", accs, sum(accs)/5)
 
-# load a model from a file
-def load_model(model_type, PATH):
-    model = model_type()
-    model.load_state_dict(torch.load(PATH))
-    return model
-
-# Perform final training after tuning and save the model
-def train_final_model(model_type, PATH, num_epochs=50, lr=1e-4, batch_size=128):
-    model = train_net(model_type, tuning=False, num_epochs=num_epochs, lr=lr, batch_size=batch_size)
-    PATH = PATH + '_' + model.name
-    print("Saving model!")
-    torch.save(model.state_dict(), PATH)
-
-# Load a model and test its accuracy to amke sure it loaded correctly
-def load_and_run_model(model_type,PATH):
-    print("Loading model!")
-    train_net(model_type, tuning=False, load_path=PATH)
-
-
-train_final_model(Models.Base_CNN, 'Final_Model',)
-
-load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
-
-#train_final_model(Models.Less_Conv_CNN, 'Final_Model',)
-
-load_and_run_model(Models.Less_Conv_CNN, 'Final_Model_Less_Conv')
-
-#train_final_model(Models.Less_Pooling_CNN, 'Final_Model',)
-
-load_and_run_model(Models.Less_Pooling_CNN, 'Final_Model_Less_Pooling')
+train_net(Models.Base_CNN, tuning=False, splits=5, num_epochs=3, lr=1e-4, batch_size=128)
