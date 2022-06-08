@@ -32,7 +32,7 @@ else:
 #
 # data_y = functions.one_hot(data_y)
 # print(data_X.shape, data_y.shape)
-def train_net(model,tuning = False, load_path = None, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128):
+def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128):
 
     # Split data into TEST and TRAIN
     # Do not touch test until eval time
@@ -44,7 +44,7 @@ def train_net(model,tuning = False, load_path = None, splits = 5, num_epochs = 5
     print("Training targets shape:", y_train_val.shape)
     if tuning:
     #Perform K-fold cross validation. This is used for tuning our model
-        accs = kfold_cross_validation(model, X_train_val, num_epochs, splits, y_train_val, lr, batch_size = batch_size)
+        accs = kfold_cross_validation(model_type, X_train_val, num_epochs, splits, y_train_val, lr, batch_size = batch_size)
         return accs
     else:
     # After tuning, train on entire train/validation set before testing on the test set
@@ -52,13 +52,16 @@ def train_net(model,tuning = False, load_path = None, splits = 5, num_epochs = 5
         data_loader = torch.utils.data.DataLoader(final_train_dataset, batch_size=128, shuffle=True)
         if load_path:
 
-            trained_model = load_model(model,load_path).to(device)
+            trained_model = load_model(model_type, load_path).to(device)
         else:
-            trained_model = train_model(model().to(device), data_loader,
-                                    x_val=X_test, y_val=y_test,
-                                    num_epochs=num_epochs,
-                                    track_training=True)
+            trained_model = train_model(model_type().to(device), data_loader,
+                                        x_val=X_test, y_val=y_test,
+                                        num_epochs=num_epochs,
+                                        track_training=True)
         print("Test accuracy: ", test_model(trained_model, X_test, y_test))
+        metrics = eval_model(trained_model, X_test, y_test)
+        print("Final Metrics:", metrics)
+        np.save('Final_Test_Metrics' + trained_model.name, metrics)
         return trained_model
 
 
@@ -173,7 +176,6 @@ def output_to_label(output):
 
 # Get evaluation metrics on a trained model given a test set
 def eval_model(model, x,y):
-    model.eval()
     test_data = TensorDataset(x, y)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     return evaluation.evaluate(test_loader, model, output_to_label)
@@ -204,10 +206,10 @@ train_final_model(Models.Base_CNN, 'Final_Model',)
 
 load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
 
-train_final_model(Models.Less_Conv_CNN, 'Final_Model',)
+#train_final_model(Models.Less_Conv_CNN, 'Final_Model',)
 
 load_and_run_model(Models.Less_Conv_CNN, 'Final_Model_Less_Conv')
 
-train_final_model(Models.Less_Pooling_CNN, 'Final_Model',)
+#train_final_model(Models.Less_Pooling_CNN, 'Final_Model',)
 
 load_and_run_model(Models.Less_Pooling_CNN, 'Final_Model_Less_Pooling')
