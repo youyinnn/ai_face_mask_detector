@@ -11,6 +11,14 @@ How To Use The Program:
 
 Driver.py is used to run the program itself and includes samples of all major function calls needed to train and characterize the nets.
 
+Note that Application.py functions use images found in test_data by default. Training.py methods rely on the entire dataset usualy kept in aug_1
+
+To load a model and run it on 1 image use Application.application_mode_single_image(model_type, saved_file_path,image_path)
+This will load an image at image_path and run it through the saved model of type model_type found at saved_file_path
+
+To load a model and run it on all images in a folder use Application.application_mode)imageset(model_type, saved_file_path,folder_path)
+This loads the images in that folder and then tests the model on them before output the evaluation data.
+
 To tune hyperparameters with 5-fold cross-validation run Training.hyper_parameter_tuning(model_type, num_trials).
 The model type should be a reference to a nn.module class. Our models are in Models.py so Models.Base_CNN is an appropriate input.
 num_trials is simply how many configurations you'd like to try.
@@ -24,8 +32,7 @@ This trains on the entire trianing and validation set before evaluating on the w
 To load a model and run it (by default on the test set) use Training.load_and_run(model_type, saved_file_path)
 Modeil_type as above and saved_file_path should be where the model file was previously saved.
 
-To load a model and run it on 1 image use Application.application_mode(model_type, saved_file_path,image_path)
-This will load an image at image_path and run it through the saved model of type model_type found at saved_file_path
+
 
 Dataset: 
 (Datasource)
