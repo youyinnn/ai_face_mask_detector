@@ -1,3 +1,4 @@
+import torch
 from torchvision.io import read_image
 import Models
 import torchvision.transforms as T
@@ -28,3 +29,18 @@ def application_mode(model_type, model_path,img_path):
     plt.show()
 
     print("Prediction: ", label_map[prediction.item()])
+
+def application_mode_imageset(model_type,model_path, ):
+    if torch.cuda.is_available():
+        # print("Using GPU!")
+        device = 'cuda'
+    else:
+        # print("Using CPU :(")
+        device = 'cpu'
+    X, y = Training.get_all_data(128, file_path='./data/test_data/')
+    #X = X.to(device)
+    #y = y.to(device)
+    model = Training.load_model(model_type,model_path).to(device)
+    results = Training.eval_model(model,X,y)
+    print(results)
+    return results

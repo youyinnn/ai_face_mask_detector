@@ -53,4 +53,7 @@ if __name__ == '__main__':
         elif flag == '-t':
             print('train the Base_CNN model')
             Training.train_final_model(Models.Base_CNN, 'Final_Model',)
+        
+        elif flag == '-test_all':
+            Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './data/test_data/')
             

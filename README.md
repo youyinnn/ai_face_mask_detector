@@ -12,12 +12,16 @@
 
 ``` bash
 ├── data                                        # dataset files
-│   ├── aug_1                                   # data that had been augmented
+│   ├── aug_1                                   # data that had been augmented for training and testing
 │   │   ├── cloth_mask                          
 │   │   ├── mask_worn_incorrectly
 │   │   ├── n95_mask
 │   │   ├── no_face_mask
 │   │   ├── surgical_mask
+│   ├── test_data                               # dataset for small testing
+│   │   ├──   .
+│   │   ├──   .
+│   │   ├──   .
 ├── data_process                                # data process or loading module
 │   ├── auto_crop.py                            # crop the image into 1:1 ratio
 │   ├── DataAugmentation.py                     # image augmentation  
@@ -80,22 +84,53 @@ This will train the whole new `Base_CNN` model.
 
 `Driver.py` is used to run the program itself and includes samples of all major function calls needed to train and characterize the nets.
 
-To tune hyperparameters with 5-fold cross-validation run `Training.hyper_parameter_tuning(model_type, num_trials)`.
+Note that `Application.py` functions use images found in test_data by default. Training.py methods rely on the entire dataset usualy kept in `./data/aug_1`
 
-The model type should be a reference to a nn.module class. Our models are in `Models.py` so `Models.Base_CNN` is an appropriate input.
+To load a model and run it on 1 image use `Application.application_mode_single_image(model_type, saved_file_path,image_path)`.
+This will load an image at image_path and run it through the saved model of type `model_type` found at `saved_file_path`
+
+To load a model and run it on all images in a folder use `Application.application_mode)imageset(model_type, saved_file_path,folder_path)`
+This loads the images in that folder and then tests the model on them before output the evaluation data.
+
+To tune hyperparameters with 5-fold cross-validation run `Training.hyper_parameter_tuning(model_type, num_trials)`.
+The model type should be a reference to a nn.module class. 
+Our models are in `Models.py` so `Models.Base_CNN` is an appropriate input.
 num_trials is simply how many configurations you'd like to try.
 
-To tune a model manually wihtout using the hyperparam tuning, use `Training.train_net(model_type, tuning=True)`.
-This does k-fold cross validation and was used to test different model configurations.
+To tune a model manually wihtout using the hyperparam tuning, use `Training.train_net(model_type,  tuning=True)` This does k-fold cross validation and was used to test different model configurations.
 
 To train and save a final model run `Training.train_final_model(model_type, filepath)`
 where `model_type` is as above and the `filepath` is where you'd like to save it.
 This trains on the entire trianing and validation set before evaluating on the withheld test data.
 
-To load a model and run it (by default on the test set) use `Training.load_and_run(model_type, saved_file_path)` with `model_type` as above and saved_file_path should be where the model file was previously saved.
+To load a model and run it (by default on the test set) use `Training.load_and_run(model_type, saved_file_path)`
+where `modeil_type` as above and `saved_file_path` should be where the model file was previously saved.
 
-To load a model and run it on 1 image use `Application.application_mode(model_type, saved_file_path, image_path)`.
-This will load an image at image_path and run it through the saved model of type model_type found at `saved_file_path`.
+### 4. Evaluation Visualization
+
+#### 4.1 Evaluate the Trained Model and Its Variants 
+
+Once you trained the models, you should have the following filse:
+
+``` bash
+├── Final_Model_Base_CNN                                 # trained model for Base_CNN
+├── Final_Model_Less_Conv                                # 
+├── Final_Model_Less_Pooling                             # 
+├── Final_Model_Less_Pooling                             # 
+├── Final_Test_MetricsBase_CNN.npy                       # scores files
+├── Final_Test_MetricsLess_Conv.npy                      # 
+├── Final_Test_MetricsLess_Pooling.npy                   # 
+├──     .
+├──     .
+└── .gitignore
+```
+
+Then you can run the notebook file `model_evaluation_data.ipynb` to visualize the scores.
+
+#### 4.2 Evaluate the Model with a Randomly Picked `test_data` Dataset
+
+Then you can run the notebook file `model_evaluation_data.ipynb` to visualize the scores.
+
 
 <!-- Dataset:
 (Datasource)
