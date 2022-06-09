@@ -8,6 +8,32 @@
 > - Jun Huang(40168167)
 > - Cheng Chen(40222770)
 
+## Files Introduction
+
+``` bash
+├── data                                        # dataset files
+│   ├── aug_1                                   # data that had been augmented
+│   │   ├── cloth_mask                          
+│   │   ├── mask_worn_incorrectly
+│   │   ├── n95_mask
+│   │   ├── no_face_mask
+│   │   ├── surgical_mask
+├── data_process                                # data process or loading module
+│   ├── auto_crop.py                            # crop the image into 1:1 ratio
+│   ├── DataAugmentation.py                     # image augmentation  
+│   ├── DatasetHelper.py                        # image loader for pytorch
+│   ├── ImageResize.py                          # resize the image into 256x256
+├── Application.py                              # application that take one image and return prediction
+├── Driver.py                                   # driver program for training, testing, running the model
+├── Models.py                                   # contains all the model architectures
+├── Training.py                                 # hosts the training process
+├── Validation.py                               # validate the output during the training
+├── evaluation.py                               # evaluate the model
+├──     .
+├──     .
+└── .gitignore
+```
+
 ## How To Use The Program
 ### 1. Preprare the Dataset and Env
 
