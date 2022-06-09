@@ -41,7 +41,7 @@
 ## How To Use The Program
 ### 1. Preprare the Dataset and Env
 
-Please make sure you have the `data/aug_1` located at the root folder of the project!
+Please make sure you have the `data/aug_1` and `data/test_data` located at the root folder of the project!
 
 Install required packages:
 
