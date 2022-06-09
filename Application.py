@@ -30,14 +30,14 @@ def application_mode(model_type, model_path,img_path):
 
     print("Prediction: ", label_map[prediction.item()])
 
-def application_mode_imageset(model_type,model_path, ):
+def application_mode_imageset(model_type,model_path, file_path='./data/test_data/' ):
     if torch.cuda.is_available():
         # print("Using GPU!")
         device = 'cuda'
     else:
         # print("Using CPU :(")
         device = 'cpu'
-    X, y = Training.get_all_data(128, file_path='./data/test_data/')
+    X, y = Training.get_all_data(128, file_path=file_path)
     #X = X.to(device)
     #y = y.to(device)
     model = Training.load_model(model_type,model_path).to(device)
