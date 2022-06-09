@@ -129,29 +129,33 @@ class Base_CNN(torch.nn.Module):
 
         self.name = "Base_CNN"
         self.layers = nn.ModuleList()
+
         self.layers += [nn.Conv2d(3, 6, kernel_size=3), nn.ReLU(inplace=True)]
-        # self.layers += [nn.MaxPool2d(2, stride=1)]
         self.layers += [nn.Conv2d(6, 12, kernel_size=3,
                                   stride=2), nn.ReLU(inplace=True)]
+
         self.layers += [nn.MaxPool2d(2, stride=1)]
+
         self.layers += [nn.Conv2d(12, 24, kernel_size=3),
                         nn.ReLU(inplace=True)]
         self.layers += [nn.Conv2d(24, 48, kernel_size=3,
                                   stride=2), nn.ReLU(inplace=True)]
+
         self.layers += [nn.MaxPool2d(2, stride=1)]
+
         self.layers += [nn.Conv2d(48, 96, kernel_size=3,
                                   stride=2), nn.ReLU(inplace=True)]
 
         self.layers += [nn.MaxPool2d(2, stride=1)]
+
         self.layers += [nn.Conv2d(96, 192, kernel_size=3,
                                   stride=2), nn.ReLU(inplace=True)]
-        #self.layers += [nn.Conv2d(96, 192, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
         self.layers += [nn.Conv2d(192, 192, kernel_size=3),
                         nn.ReLU(inplace=True)]
-        #self.layers += [nn.Conv2d(192, 96, kernel_size=3, stride=2), nn.ReLU(inplace=True)]
+
         self.linear1 = nn.LazyLinear(256)
         self.linear2 = nn.Linear(256, 256)
-        # self.layers += [nn.LazyLinear(32), nn.ReLU(inplace=True)]
+
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
