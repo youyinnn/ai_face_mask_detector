@@ -19,3 +19,25 @@ doc/output/main.synctex.gz
 *.fdb_latexmk
 
 .idea
+
+alex_net_1_training.ipynb
+alex_net_2_training.ipynb
+alex_net_3_training.ipynb
+alex_net_showcase.ipynb
+model/AlexNet.py
+model/ChenCNN.py
+model/alex_net/net1/net1_f1_loss_acc.npy
+model/alex_net/net1/net1_f2_loss_acc.npy
+model/alex_net/net1/net1_f3_loss_acc.npy
+model/alex_net/net1/net1_f4_loss_acc.npy
+model/alex_net/net1/net1_f5_loss_acc.npy
+model/alex_net/net2/net2_f1_loss_acc.npy
+model/alex_net/net2/net2_f2_loss_acc.npy
+model/alex_net/net2/net2_f3_loss_acc.npy
+model/alex_net/net2/net2_f4_loss_acc.npy
+model/alex_net/net2/net2_f5_loss_acc.npy
+model/alex_net/net3/net3_f1_loss_acc.npy
+model/alex_net/net3/net3_f2_loss_acc.npy
+model/alex_net/net3/net3_f3_loss_acc.npy
+model/alex_net/net3/net3_f4_loss_acc.npy
+model/alex_net/net3/net3_f5_loss_acc.npy
