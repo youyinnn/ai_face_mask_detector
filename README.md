@@ -1,6 +1,4 @@
-### AI Face Mask Detector
-
----
+## AI Face Mask Detector
 
 > Team name:OB_13
 >
@@ -10,9 +8,49 @@
 > - Jun Huang(40168167)
 > - Cheng Chen(40222770)
 
----
+## How To Use The Program
+### 1. Preprare the Dataset and Env
 
-### How To Use The Program
+Please make sure you have the `data/aug_1` located at the root folder of the project!
+
+Install required packages:
+
+``` bash
+pip install -r requirements.txt
+```
+
+### 2. Play with the Project
+
+If you want to playwith our trained model, please make sure you have the `Final_Model_Base_CNN`, `Final_Model_Less_Conv`, and `Final_Model_Less_Pooling` model files located at the root folder of the project!
+
+For predicting one image, you can run `Driver.py` with flag `-p`:
+
+``` bash
+python Driver.py -p ./data/aug_1/mask_worn_incorrectly/4_00001_aug_2.jpeg
+```
+
+### 3. Train the Model Yourself
+
+#### 3.1 Train with One Command
+
+For training the `Models.Base_CNN`, you can run `Driver.py` with flag `-t`:
+
+``` bash
+python Driver.py -t
+```
+
+This will train the whole new `Base_CNN` model.
+#### 3.2 Test the Base_CNN with One Command
+
+For loading and testing the trained `Models.Base_CNN`, you can run `Driver.py` with flag `-t`:
+
+``` bash
+!python Driver.py -t
+```
+
+#### 3.3 More Details of the `Driver.py`
+
+This will train the whole new `Base_CNN` model.
 
 `Driver.py` is used to run the program itself and includes samples of all major function calls needed to train and characterize the nets.
 
@@ -25,7 +63,7 @@ To tune a model manually wihtout using the hyperparam tuning, use `Training.trai
 This does k-fold cross validation and was used to test different model configurations.
 
 To train and save a final model run `Training.train_final_model(model_type, filepath)`
-where `model_type` is as above and the filepath is where you'd like to save it.
+where `model_type` is as above and the `filepath` is where you'd like to save it.
 This trains on the entire trianing and validation set before evaluating on the withheld test data.
 
 To load a model and run it (by default on the test set) use `Training.load_and_run(model_type, saved_file_path)` with `model_type` as above and saved_file_path should be where the model file was previously saved.

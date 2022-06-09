@@ -1,4 +1,5 @@
 import copy
+import os
 
 import numpy as np
 import torchvision.transforms as T
@@ -20,8 +21,12 @@ import matplotlib.pyplot as plt
 if torch.cuda.is_available():
     #print("Using GPU!")
     device = 'cuda'
+    load_kws = {}
 else:
     #print("Using CPU :(")
+    load_kws = {
+        'map_location': torch.device('cpu')
+    }
     device = 'cpu'
 # unzip the augmented dataset and load it
 # data = ImageDataset('./dataset')
@@ -114,7 +119,7 @@ def test_model(model, X, y):
 def get_all_data(resize = 128):
     # Size set to 128 to prevent memory issues
     transform_train = T.Compose([T.Resize((resize, resize))])
-    data = ImageDataset('./aug_1/', transform=transform_train)
+    data = ImageDataset(os.path.join(os.getcwd(), 'data', 'aug_1'), transform=transform_train)
     # model = Models.LinearNet()
     # Using a batch size larger than the dataset means all data is retrieved in one loop iteration
     # Stretch goal: Make this work on arbitrarily large datasets by stacking the tensors in the data_loader
@@ -186,7 +191,8 @@ def eval_model(model, x,y):
 # load a model from a file
 def load_model(model_type, PATH):
     model = model_type()
-    model.load_state_dict(torch.load(PATH))
+    print(load_kws)
+    model.load_state_dict(torch.load(PATH, **load_kws))
     return model
 
 # Perform final training after tuning and save the model
