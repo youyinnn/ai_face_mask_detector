@@ -21,13 +21,13 @@ import Application
 
 # Loads a saved model and runs it on the test set.
 # Generates the test metrics.
-Training.load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
+#Training.load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
 
 #Runs a model in application mode. Loads a pretrained model from model_path to make a prediction on the image at img_path
-#Application.application_mode_single_image(model_type=Models.Base_CNN, model_path='Final_Model_Base_CNN', img_path='test_data/cloth_mask/0_00001.jpeg')
+Application.application_mode_single_image(model_type=Models.Base_CNN, model_path='Final_Model_Base_CNN', img_path='test_data/cloth_mask/0_00001.jpeg')
 
 # loads a model and runs it on the images found in folders under test_data
-#Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './test_data/')
+Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './test_data/')
 #Training.train_final_model(Models.Less_Conv_CNN, 'Final_Model',)
 #print("Loading Less Conv")
 #Training.load_and_run_model(Models.Less_Conv_CNN, 'Final_Model_Less_Conv')

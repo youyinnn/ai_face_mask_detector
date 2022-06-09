@@ -5,7 +5,7 @@ Team name:OB_13
 
 Team members:Alexander Fulleringer, Jun Huang, Cheng Chen
 
-ID numbers: Alexander Fulleringer, Jun Huang, 40222770
+ID numbers: 40005290, Jun Huang, 40222770
 
 How To Use The Program:
 
