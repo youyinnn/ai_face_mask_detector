@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as functions
 import sklearn
 import sklearn.model_selection
-import Evaluation
+import evaluation
 import Models
 from torch.utils.data import DataLoader, TensorDataset
 
