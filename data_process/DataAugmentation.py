@@ -13,11 +13,11 @@ import torch
 
 def randon_transform(img):
     transforms = torch.nn.Sequential(
-        T.Resize((256, 256)),
+        # T.Resize((256, 256)),
         T.ColorJitter(hue=.02, saturation=.02),
         T.RandomHorizontalFlip(),
-        T.RandomVerticalFlip(),
-        T.RandomRotation(30, resample=PIL.Image.BILINEAR),
+        # T.RandomVerticalFlip(),
+        T.RandomRotation(20, resample=PIL.Image.BILINEAR),
         T.RandomAdjustSharpness(sharpness_factor=2),
         T.RandomAutocontrast(),
     )
