@@ -63,19 +63,19 @@ python Driver.py -p ./data/aug_1/mask_worn_incorrectly/4_00001_aug_2.jpeg
 
 #### 3.1 Train with One Command
 
-For training the `Models.Base_CNN`, you can run `Driver.py` with flag `-t`:
+For training the `Models.Base_CNN`, you can run `Driver.py` with flag `-t` and specifying the dataset path:
 
 ``` bash
-python Driver.py -t
+python Driver.py -t ./data/aug_1 
 ```
 
 This will train the whole new `Base_CNN` model.
 #### 3.2 Test the Base_CNN with One Command
 
-For loading and testing the trained `Models.Base_CNN`, you can run `Driver.py` with flag `-t`:
+For loading and testing the trained `Models.Base_CNN`, you can run `Driver.py` with flag `-r` and specifying the dataset path:
 
 ``` bash
-!python Driver.py -t
+python Driver.py -r ./data/aug_1
 ```
 
 #### 3.3 More Details of the `Driver.py`

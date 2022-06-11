@@ -37,11 +37,11 @@ else:
 #
 # data_y = functions.one_hot(data_y)
 # print(data_X.shape, data_y.shape)
-def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128):
+def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epochs = 50, lr = 1e-3, batch_size = 128,  dataset_path = './data/aug_1/'):
 
     # Split data into TEST and TRAIN
     # Do not touch test until eval time
-    X,y = get_all_data()
+    X,y = get_all_data(dataset_path)
     #Setting random state means the training/validation and test images are the same between runs
     X_train_val,X_test,y_train_val,y_test = sklearn.model_selection.train_test_split(
         X,y,test_size=.2, stratify=y, random_state=6721)
@@ -116,10 +116,10 @@ def test_model(model, X, y):
     return overall_accuracy/total_samples
 
 # retrieve the entire dataset and returns 2 tensors, 1 data and 1 targets
-def get_all_data(resize = 128, file_path= './data/aug_1/'):
+def get_all_data(dataset_path, resize = 128, ):
     # Size set to 128 to prevent memory issues
     transform_train = T.Compose([T.Resize((resize, resize))])
-    data = ImageDataset(file_path, transform=transform_train)
+    data = ImageDataset(dataset_path, transform=transform_train)
     # model = Models.LinearNet()
     # Using a batch size larger than the dataset means all data is retrieved in one loop iteration
     # Stretch goal: Make this work on arbitrarily large datasets by stacking the tensors in the data_loader
@@ -196,16 +196,16 @@ def load_model(model_type, PATH):
     return model
 
 # Perform final training after tuning and save the model
-def train_final_model(model_type, PATH, num_epochs=50, lr=1e-4, batch_size=128):
-    model = train_net(model_type, tuning=False, num_epochs=num_epochs, lr=lr, batch_size=batch_size)
+def train_final_model(model_type, PATH, dataset_path = './data/aug_1', num_epochs=50, lr=1e-4, batch_size=128):
+    model = train_net(model_type, tuning=False, num_epochs=num_epochs, lr=lr, batch_size=batch_size, dataset_path=dataset_path)
     PATH = PATH + '_' + model.name
     print("Saving model!")
     torch.save(model.state_dict(), PATH)
 
 # Load a model and test its accuracy to amke sure it loaded correctly
-def load_and_run_model(model_type,PATH):
+def load_and_run_model(model_type,PATH, dataset_path = './data/aug_1'):
     print("Loading model!")
-    train_net(model_type, tuning=False, load_path=PATH)
+    train_net(model_type, tuning=False, load_path=PATH, dataset_path=dataset_path)
 
 
 #train_final_model(Models.Base_CNN, 'Final_Model',)

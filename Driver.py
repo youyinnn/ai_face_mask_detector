@@ -43,7 +43,10 @@ if __name__ == '__main__':
         flag = sys.argv[1]
         if flag == '-r':
             print('load and test the Base_CNN model')
-            Training.load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
+            if len(sys.argv) > 2:
+                Training.load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN', sys.argv[2])
+            else:
+                Training.load_and_run_model(Models.Base_CNN, 'Final_Model_Base_CNN')
         elif flag == '-p':
             print('get prediction with Base_CNN model')
             image_path = sys.argv[2]
@@ -52,8 +55,14 @@ if __name__ == '__main__':
                              img_path=image_path)
         elif flag == '-t':
             print('train the Base_CNN model')
-            Training.train_final_model(Models.Base_CNN, 'Final_Model',)
+            if len(sys.argv) > 2:
+                Training.train_final_model(Models.Base_CNN, 'Final_Model', sys.argv[2])
+            else:
+                Training.train_final_model(Models.Base_CNN, 'Final_Model')
         
         elif flag == '-test_all':
-            Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './data/test_data/')
+            if len(sys.argv) > 2:
+                Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', sys.argv[2])
+            else:
+                Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './data/test_data/')
             
