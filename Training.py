@@ -65,7 +65,7 @@ def train_net(model_type, tuning = False, load_path = None, splits = 5, num_epoc
         print("Test accuracy: ", test_model(trained_model, X_test, y_test))
         metrics = eval_model(trained_model, X_test, y_test)
         print("Final Report:", metrics['report'])
-        np.save('Final_Test_Metrics' + trained_model.name, metrics)
+        np.savez('Final_Test_Metrics' + trained_model.name, **metrics)
         return trained_model
 
 
@@ -101,6 +101,7 @@ def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_
 def test_model(model, X, y):
     X = X.to(device)
     y = y.to(device)
+    y = evaluation.downgrade_target(y, device)
     test_data = TensorDataset(X, y)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     #print("y_val shape:", y.shape)
@@ -142,6 +143,9 @@ def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4
         for data, target in data_loader:
             data = data.to(device)
             target = target.to(device)
+
+            target = evaluation.downgrade_target(target, device)
+
             optimizer.zero_grad()
             y_pred = model(data).to(device)
             #print(target)
@@ -172,18 +176,11 @@ def hyper_parameter_tuning(model_type, n_trials):
     print(num_epochs)
     print(mean_accs)
 
-# Helper method to get predictions from model output
-def output_to_label(output):
-    print(output)
-    rs = output.argmax(axis=1)
-  # [1,2,3,100,1] -> 3
-    return rs
-
 # Get evaluation metrics on a trained model given a test set
 def eval_model(model, x,y):
     test_data = TensorDataset(x, y)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
-    return evaluation.evaluate(test_loader, model, output_to_label)
+    return evaluation.evaluate(test_loader, model, device=device)
 #hyper_parameter_tuning(Models.Base_CNN,3)
 #accs = train_net(Models.Base_CNN, tuning=True, splits=5, num_epochs=50, lr=1e-4, batch_size=128)
 #print("Accuracies: ", accs, sum(accs)/5)
