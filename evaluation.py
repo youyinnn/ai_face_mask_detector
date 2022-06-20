@@ -143,3 +143,108 @@ def evaluate(test_loader, model,
     #print("THE REPORT:")
     #print(classification_report)
     return results
+
+labels_name = ['cloth', 'no_face', 'surgical', 'n95', 'incorrect']
+labels_name_gen = ['cloth_m', 'cloth_fm', 'no_face_m', 'no_face_fm', 'surgical_m', 'surgical_fm', 'n95_m', 'n95_fm', 'incorrect_m', 'incorrect_fm']
+labels_name_race = ['cloth_caas', 'cloth_afar', 'no_face_caas', 'no_face_afar', 'surgical_caas', 'surgical_afar', 'n95_caas', 'n95_afar', 'incorrect_caas', 'incorrect_afar']
+
+import itertools
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
+from data_process.DatasetHelper import label_map, label_map_new_gen, label_map_new_race
+
+def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+    plt.figure(figsize=(8, 6), dpi=150)
+    """
+    - cm :  calculate the value of the confusion matrix
+    - classes : class for every row/column
+    - normalize : True:show percentage, False:show counts
+    """
+    if normalize:   #for calculating the percentage
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        # print("show percentage：")
+        np.set_printoptions(formatter={'float': '{: 0.2f}'.format})
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    #interpolation = 'nearest': when the display resolution is different with our image,
+    #our script will output the image without adding other values between pixels.
+    #https://matplotlib.org/stable/gallery/images_contours_and_fields/interpolation_methods.html
+    plt.title(title, fontsize=15, pad=10) # adding our title 
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=-30)#deciding what labels will be shown on x axis
+    plt.yticks(tick_marks, classes)# deciding what labels will be shown on y axis
+    plt.ylim(len(classes) - 0.5, -0.5)
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+    plt.tight_layout()
+    plt.ylabel('True label', fontsize=12)  #y axis label
+    plt.xlabel('Predicted label', fontsize=12)  #x axis label
+    plt.show()
+
+def read_socres(file_path, conf_m_title):
+    print(file_path)
+    if os.path.exists(file_path):
+      with open(file_path, 'rb') as f:
+          a = np.load(f, allow_pickle=True)
+          report = a['report']
+          # print(a.item().keys())
+          
+          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
+          for k in label_map.keys():
+              del report.item()[label_map[k]]['support']
+              for kk in report.item()[label_map[k]].keys():
+                df_arr[kk].append(report.item()[label_map[k]][kk])
+          df = pd.DataFrame(data=df_arr, index=labels_name)
+          
+          print(df)
+          
+          print('Overall acc: ', a['acc'])
+          plot_confusion_matrix(a['conf_m'], classes=labels_name, title=conf_m_title)
+          
+def read_socres_gen(file_path, conf_m_title):
+    print(file_path)
+    if os.path.exists(file_path):
+      with open(file_path, 'rb') as f:
+          a = np.load(f, allow_pickle=True)
+          report = a['report_gen']
+          # print(a.item().keys())
+          
+          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
+          for k in label_map_new_gen.keys():
+              del report.item()[label_map_new_gen[k]]['support']
+              for kk in report.item()[label_map_new_gen[k]].keys():
+                df_arr[kk].append(report.item()[label_map_new_gen[k]][kk])
+          df = pd.DataFrame(data=df_arr, index=labels_name_gen)
+          
+          print(df)
+          print('Overall acc: ', a['acc'])
+          plot_confusion_matrix(a['conf_m_gen'], classes=labels_name_gen, title=conf_m_title)
+
+
+def read_socres_race(file_path, conf_m_title):
+    print(file_path)
+    if os.path.exists(file_path):
+      with open(file_path, 'rb') as f:
+          a = np.load(f, allow_pickle=True)
+          report = a['report_race']
+          # print(a.item().keys())
+          
+          df_arr = {'class': [], 'precision': [], 'recall': [], 'f1-score': []}
+          for k in label_map_new_race.keys():
+              del report.item()[label_map_new_race[k]]['support']
+              for kk in report.item()[label_map_new_race[k]].keys():
+                df_arr[kk].append(report.item()[label_map_new_race[k]][kk])
+              df_arr['class'].append(label_map_new_race[k])
+          df = pd.DataFrame(data=df_arr)
+          
+          print(df)
+          print('Overall acc: ', a['acc'])
+          plot_confusion_matrix(a['conf_m_race'], classes=labels_name_race, title=conf_m_title)
+
