@@ -30,6 +30,7 @@ def application_mode(model_type, model_path,img_path):
 
     print("Prediction: ", label_map[prediction.item()])
 
+
 def application_mode_imageset(model_type,model_path, file_path='./data/test_data/' ):
     if torch.cuda.is_available():
         # print("Using GPU!")

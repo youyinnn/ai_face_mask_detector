@@ -119,8 +119,56 @@ class AlexNet(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+class Base_CNN_Part2(torch.nn.Module):
+    def __init__(self):
+        super(Base_CNN_Part2, self).__init__()
 
-# Accuracy ~66%
+        self.name = "Base_CNN_Part2"
+        self.layers = nn.ModuleList()
+
+        self.layers += [nn.Conv2d(3, 12, kernel_size=5, padding=4), nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(12, 24, kernel_size=3, padding=1,
+                                  stride=2), nn.ReLU(inplace=True)]
+
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+
+        self.layers += [nn.Conv2d(24, 36, kernel_size=3),
+                        nn.ReLU(inplace=True)]
+        self.layers += [nn.Conv2d(36, 48, kernel_size=5, padding=2,
+                                  stride=2), nn.ReLU(inplace=True)]
+
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+
+        self.layers += [nn.Conv2d(48, 96, kernel_size=5, padding=2,
+                                  stride=2), nn.ReLU(inplace=True)]
+
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+
+        self.layers += [nn.Conv2d(96, 192, kernel_size=3,
+                                  stride=2), nn.ReLU(inplace=True)]
+
+        self.layers += [nn.MaxPool2d(2, stride=1)]
+        self.layers += [nn.Conv2d(192, 192, kernel_size=3),
+                        nn.ReLU(inplace=True)]
+
+        self.linear1 = nn.LazyLinear(256)
+        self.linear2 = nn.Linear(256, 256)
+
+        self.fc = nn.LazyLinear(5)
+
+    def forward(self, x):
+        N, C, H, W = x.shape
+        #x = x.reshape(x.shape[0], x.shape[1], -1)
+        # x = self.layers[0](x)
+        #x = x.reshape(x.shape[0], x.shape[1], 56, 56)
+        for i in range(0, len(self.layers)):
+            x = self.layers[i](x)
+        x = x.view(N, -1)
+        x = self.linear1(x)
+        x = self.linear2(x)
+        x = self.fc(x)
+        # x = torch.softmax(x,dim=1)
+        return x
 
 
 class Base_CNN(torch.nn.Module):

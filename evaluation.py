@@ -176,6 +176,7 @@ def evaluate(test_loader, model,
     }
     #print("THE REPORT:")
     #print(classification_report)
+    model.train()
     return results
 
 five_label_display_name = ['cloth', 'no_face', 'surgical', 'n95', 'incorrect']

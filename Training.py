@@ -12,6 +12,7 @@ import sklearn
 import sklearn.model_selection
 import evaluation
 import Models
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader, TensorDataset
 
 from data_process.DatasetHelper import label_map
@@ -76,7 +77,7 @@ def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_
     # Stratified K-fold ensures balanced class representation
     SKF = sklearn.model_selection.StratifiedKFold(n_splits=splits)
     accuracies = [0] * splits
-    i = 0
+    i = 1
     # Perform the k-fold cross validation
 
     for train_index, val_index in SKF.split(X_train_val, torch.argmax(y_train_val, dim=1)):
@@ -88,20 +89,28 @@ def kfold_cross_validation(base_model, X_train_val, num_epochs, splits, y_train_
         trained_model = train_model(model_to_train, data_loader,
                                     x_val=X_val, y_val=y_val,
                                     num_epochs=num_epochs, lr=lr)
-        print("Evaluation metrics for this fold:")
-        print(eval_model(trained_model,X_val,y_val)['report'])
+        # print("Evaluation metrics for this fold:")
+        # print(eval_model(trained_model,X_val,y_val)['report'])
+
+        metrics = eval_model(trained_model, X_val, y_val)
+        print(f"Final Report for fold {i}:", metrics['report'])
+        np.savez(f'Fold_{i}_Metrics' + trained_model.name, **metrics)
         acc = test_model(trained_model, X_val, y_val)
-        accuracies[i] = acc
+        accuracies[i-1] = acc
         # print('Fold accuracy: ', acc)
         # print(accuracies[i])
         i = i + 1
+    print(f"{splits}-fold validation accuracies", accuracies)
+    print(f"Mean accuracy:{100*sum(accuracies)/splits}%")
     return accuracies
 
 
-def test_model(model, X, y):
+def test_model(model, X, y, downgrade=True):
+    model.eval()
     X = X.to(device)
     y = y.to(device)
-    y = evaluation.downgrade_target(y, device)
+    if downgrade:
+        y = evaluation.downgrade_target(y, device)
     test_data = TensorDataset(X, y)
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=128, shuffle=True)
     #print("y_val shape:", y.shape)
@@ -113,7 +122,7 @@ def test_model(model, X, y):
         accuracy = sklearn.metrics.accuracy_score(labels.argmax(dim=1).cpu().detach().numpy(), y_pred.argmax(dim=1).cpu().detach().numpy())
         overall_accuracy = overall_accuracy + accuracy * num_samples
         total_samples = total_samples + num_samples
-
+    model.train()
     return overall_accuracy/total_samples
 
 # retrieve the entire dataset and returns 2 tensors, 1 data and 1 targets
@@ -133,10 +142,14 @@ def get_all_data(dataset_path, resize = 128, ):
 
     return data_X, data_y
 
-def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4, track_training = False):
+
+def train_model(model, data_loader, x_val=None, y_val=None, num_epochs=50, lr=1e-4, track_training=False, split = 0):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     all_metrics = np.zeros((num_epochs,4))
     model.train()
+    train_accs = torch.zeros(num_epochs)
+    test_accs = torch.zeros(num_epochs)
+
     for epoch in range(num_epochs):
         if epoch % 5 == 0:
             print(f'Starting Epoch {epoch+1} of {num_epochs}')
@@ -153,13 +166,36 @@ def train_model(model, data_loader,x_val=None,y_val=None, num_epochs=50, lr=1e-4
             loss = functions.binary_cross_entropy_with_logits(y_pred, target.float())
             loss.backward()
             optimizer.step()
+        if track_training:
+            #Track training and test accuracy for each epoch
+            num_correct = 0
+            total = 0
+            for data, target in data_loader:
+                data = data.to(device)
+                target = target.to(device)
+                target = evaluation.downgrade_target(target, device)
+                num_correct = num_correct + test_model(model, data, target, downgrade=False) * data.shape[0]
+                total = total + data.shape[0]
+            train_accs[epoch] = num_correct/total
+            test_acc = test_model(model, x_val, y_val, downgrade=True)
+            test_accs[epoch] = test_acc
         #last_acc = test_model(model,x_val,y_val)
         #print(f"Epoch {epoch} accuracy: {last_acc*100}%")
         if track_training:
             metrics = eval_model(model,x_val,y_val)
             all_metrics[epoch] = np.array((metrics['acc'], metrics['pre'], metrics['rec'],metrics['f1']))
     if track_training:
-        np.save('Metrics_Tracking_'+model.name, all_metrics)
+        np.save('Metrics_Tracking_' + model.name, all_metrics)
+        #Make a plot for the training curve
+        plt.plot(range(num_epochs),train_accs, label = "Training Accuracies")
+        plt.plot(range(num_epochs),test_accs, label = "Testing Accuracies")
+        plt.title("Training and Testing accuracy curves")
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.show()
+        print("training accs:", train_accs)
+        print("testing accs:", test_accs)
+
     return model
 
 # Performs the hyperparameter tuning using random search.
