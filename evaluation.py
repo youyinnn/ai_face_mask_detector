@@ -5,11 +5,12 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn import metrics
 import numpy as np
 
-
-# the evaluation function, use it by:
-#   1. provide your data loader for the test data
-#   2. the prediction function
-#   3. the function to translate the original model output to the label, say: [0.13, 32, 0, 0, -0.33] -> 1
+import itertools
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
+from data_process.DatasetHelper import mask_label_list, mask_gen_label_list, mask_race_label_list
 
 def downgrade_target(targets, device):
   down_grade_target = [list(torch.sum(torch.reshape(t, (5, 4)), dim=1).cpu().detach().numpy()) for t in targets]
@@ -114,16 +115,16 @@ def evaluate(test_loader, model,
     conf_m = confusion_matrix(all_targets, all_outputs, )
 
     classification_report = metrics.classification_report(all_targets, all_outputs, target_names=
-    ['cloth_mask', 'no_face_mask', 'surgical_mask', 'n95_mask', 'mask_worn_incorrectly'],
+    mask_label_list,
                                                           digits=4, output_dict=True)
 
     classification_report_gen = metrics.classification_report(all_new_targets_gen, all_new_outputs_gen, target_names=
-    ['cloth_mask_m', 'cloth_mask_fm', 'no_face_mask_m', 'no_face_mask_fm', 'surgical_mask_m', 'surgical_mask_fm', 'n95_mask_m', 'n95_mask_fm', 'mask_worn_incorrectly_m', 'mask_worn_incorrectly_fm'],
+    mask_gen_label_list,
                                                           digits=4, output_dict=True)
     conf_m_gen = confusion_matrix(all_new_targets_gen, all_new_outputs_gen, )
     
     classification_report_race = metrics.classification_report(all_new_targets_race, all_new_outputs_race, target_names=
-    ['cloth_mask_caas', 'cloth_mask_afar', 'no_face_mask_caas', 'no_face_mask_afar', 'surgical_mask_caas', 'surgical_mask_afar', 'n95_mask_caas', 'n95_mask_afar', 'mask_worn_incorrectly_caas', 'mask_worn_incorrectly_afar'],
+    mask_race_label_list,
                                                           digits=4, output_dict=True)
     conf_m_race = confusion_matrix(all_new_targets_race, all_new_outputs_race, )
     
@@ -144,16 +145,9 @@ def evaluate(test_loader, model,
     #print(classification_report)
     return results
 
-labels_name = ['cloth', 'no_face', 'surgical', 'n95', 'incorrect']
-labels_name_gen = ['cloth_m', 'cloth_fm', 'no_face_m', 'no_face_fm', 'surgical_m', 'surgical_fm', 'n95_m', 'n95_fm', 'incorrect_m', 'incorrect_fm']
-labels_name_race = ['cloth_caas', 'cloth_afar', 'no_face_caas', 'no_face_afar', 'surgical_caas', 'surgical_afar', 'n95_caas', 'n95_afar', 'incorrect_caas', 'incorrect_afar']
-
-import itertools
-import numpy as np
-import os
-import matplotlib.pyplot as plt
-import pandas as pd
-from data_process.DatasetHelper import label_map, label_map_new_gen, label_map_new_race
+five_label_display_name = ['cloth', 'no_face', 'surgical', 'n95', 'incorrect']
+gen_label_display_name = ['cloth_m', 'cloth_fm', 'no_face_m', 'no_face_fm', 'surgical_m', 'surgical_fm', 'n95_m', 'n95_fm', 'incorrect_m', 'incorrect_fm']
+race_label_display_name = ['cloth_caas', 'cloth_afar', 'no_face_caas', 'no_face_afar', 'surgical_caas', 'surgical_afar', 'n95_caas', 'n95_afar', 'incorrect_caas', 'incorrect_afar']
 
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.figure(figsize=(8, 6), dpi=150)
@@ -197,16 +191,16 @@ def read_socres(file_path, conf_m_title):
           # print(a.item().keys())
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': []}
-          for k in label_map.keys():
-              del report.item()[label_map[k]]['support']
-              for kk in report.item()[label_map[k]].keys():
-                df_arr[kk].append(report.item()[label_map[k]][kk])
-          df = pd.DataFrame(data=df_arr, index=labels_name)
+          for mask_label in mask_label_list:
+              del report.item()[mask_label]['support']
+              for kk in report.item()[mask_label].keys():
+                df_arr[kk].append(report.item()[mask_label][kk])
+          df = pd.DataFrame(data=df_arr, index=five_label_display_name)
           
           print(df)
           
           print('Overall acc: ', a['acc'])
-          plot_confusion_matrix(a['conf_m'], classes=labels_name, title=conf_m_title)
+          plot_confusion_matrix(a['conf_m'], classes=five_label_display_name, title=conf_m_title)
           
 def read_socres_gen(file_path, conf_m_title):
     print(file_path)
@@ -217,15 +211,25 @@ def read_socres_gen(file_path, conf_m_title):
           # print(a.item().keys())
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': []}
-          for k in label_map_new_gen.keys():
-              del report.item()[label_map_new_gen[k]]['support']
-              for kk in report.item()[label_map_new_gen[k]].keys():
-                df_arr[kk].append(report.item()[label_map_new_gen[k]][kk])
-          df = pd.DataFrame(data=df_arr, index=labels_name_gen)
+          for gen_label in mask_gen_label_list:
+              del report.item()[gen_label]['support']
+              for kk in report.item()[gen_label].keys():
+                df_arr[kk].append(report.item()[gen_label][kk])
+                
+          bias = []
+          for i in range(len(df_arr['f1-score'])):
+            if i % 2 != 0:
+              bias.append(df_arr['f1-score'][i] - df_arr['f1-score'][i - 1])
+            else:
+              bias.append(' ')
+              
+          df_arr['bias(fm - m)'] = bias
+                
+          df = pd.DataFrame(data=df_arr, index=gen_label_display_name)
           
           print(df)
           print('Overall acc: ', a['acc'])
-          plot_confusion_matrix(a['conf_m_gen'], classes=labels_name_gen, title=conf_m_title)
+          plot_confusion_matrix(a['conf_m_gen'], classes=gen_label_display_name, title=conf_m_title)
 
 
 def read_socres_race(file_path, conf_m_title):
@@ -236,15 +240,23 @@ def read_socres_race(file_path, conf_m_title):
           report = a['report_race']
           # print(a.item().keys())
           
-          df_arr = {'class': [], 'precision': [], 'recall': [], 'f1-score': []}
-          for k in label_map_new_race.keys():
-              del report.item()[label_map_new_race[k]]['support']
-              for kk in report.item()[label_map_new_race[k]].keys():
-                df_arr[kk].append(report.item()[label_map_new_race[k]][kk])
-              df_arr['class'].append(label_map_new_race[k])
-          df = pd.DataFrame(data=df_arr)
+          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
+          for race_label in mask_race_label_list:
+              del report.item()[race_label]['support']
+              for kk in report.item()[race_label].keys():
+                df_arr[kk].append(report.item()[race_label][kk])
+          
+          bias = []
+          for i in range(len(df_arr['f1-score'])):
+            if i % 2 != 0:
+              bias.append(df_arr['f1-score'][i] - df_arr['f1-score'][i - 1])
+            else:
+              bias.append(' ')
+              
+          df_arr['bias(afar - caas)'] = bias
+          df = pd.DataFrame(data=df_arr, index=race_label_display_name)
           
           print(df)
           print('Overall acc: ', a['acc'])
-          plot_confusion_matrix(a['conf_m_race'], classes=labels_name_race, title=conf_m_title)
+          plot_confusion_matrix(a['conf_m_race'], classes=race_label_display_name, title=conf_m_title)
 

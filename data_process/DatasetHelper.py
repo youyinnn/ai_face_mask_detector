@@ -74,6 +74,10 @@ label_map_new_race = {
     9: 'mask_worn_incorrectly_afar',
 }
 
+mask_label_list = list(label_map.values())
+mask_gen_label_list = list(label_map_new_gen.values())
+mask_race_label_list = list(label_map_new_race.values())
+
 class ImageDataset(Dataset):
 
     def __init__(self, img_root_dir, transform=None, target_transform=None):
