@@ -10,7 +10,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
-from data_process.DatasetHelper import mask_label_list, mask_gen_label_list, mask_race_label_list
+from data_process.DatasetHelper import mask_label_name_list, mask_gen_label_name_list, mask_race_label_name_list
 
 def downgrade_target(targets, device):
   down_grade_target = [list(torch.sum(torch.reshape(t, (5, 4)), dim=1).cpu().detach().numpy()) for t in targets]
@@ -60,6 +60,36 @@ def downgrade_argmax_target_to_race(t):
     return 8
   if t in [18, 19]:
     return 9
+  
+def get_classification_report_with_acc_from_confusion_map(cm, taget_label_name, f1_beta = 1, digit = 10):
+    def get_TPFPFNTN_per_class(label_idx, cm):
+        tp = cm[label_idx][label_idx]
+        tn = np.sum(cm[label_idx]) + np.sum(np.transpose(cm)[label_idx]) - tp
+        fp = np.sum(np.transpose(cm)[label_idx]) - tp
+        fn = np.sum(cm[label_idx]) - tp
+        return tp, fp, fn, tn
+
+    def get_pre_rec__f1_acc_from_TPFPFNTN(tp, fp, fn, tn, beta):
+        tp = float(tp)
+        fp = float(fp)
+        fn = float(fn)
+        tn = float(tn)
+        pre = round(tp / (tp + fp), digit) if (tp + fp) != 0 else -1
+        rec = round(tp / (tp + fn), digit) if (tp + fp) != 0 else -1
+        f1 = round(((beta * beta + 1.0) * (pre * rec)) / (beta * beta * pre + rec), digit) if (beta * beta * pre + rec) != 0 else -1
+        acc = round((tp + tn) / (tp + fp + fn + tn), digit) if (tp + fp + fn + tn) != 0 else -1
+    
+        return {
+            'precision': pre,
+            'recall': rec,
+            'f1-score': f1,
+            'accuary': acc
+        }
+        
+    report = {}
+    for i in range(len(taget_label_name)):
+        report[taget_label_name[i]] = get_pre_rec__f1_acc_from_TPFPFNTN(*get_TPFPFNTN_per_class(i, cm), f1_beta)
+    return report
 
 def evaluate(test_loader, model,
              pre_average='micro', rec_average='micro', f1_average='micro', device='cpu'):
@@ -114,20 +144,23 @@ def evaluate(test_loader, model,
     f1 = f1_score(all_targets, all_outputs, average=f1_average)
     conf_m = confusion_matrix(all_targets, all_outputs, )
 
-    classification_report = metrics.classification_report(all_targets, all_outputs, target_names=
-    mask_label_list,
-                                                          digits=4, output_dict=True)
+    # classification_report = metrics.classification_report(all_targets, all_outputs, target_names=
+    # mask_label_name_list,
+    #                                                       digits=4, output_dict=True)
+    
+    classification_report = get_classification_report_with_acc_from_confusion_map(conf_m, mask_label_name_list)
 
-    classification_report_gen = metrics.classification_report(all_new_targets_gen, all_new_outputs_gen, target_names=
-    mask_gen_label_list,
-                                                          digits=4, output_dict=True)
     conf_m_gen = confusion_matrix(all_new_targets_gen, all_new_outputs_gen, )
+    # classification_report_gen = metrics.classification_report(all_new_targets_gen, all_new_outputs_gen, target_names=
+    # mask_gen_label_name_list,
+    #                                                       digits=4, output_dict=True)
+    classification_report_gen = get_classification_report_with_acc_from_confusion_map(conf_m_gen, mask_gen_label_name_list)
     
-    classification_report_race = metrics.classification_report(all_new_targets_race, all_new_outputs_race, target_names=
-    mask_race_label_list,
-                                                          digits=4, output_dict=True)
     conf_m_race = confusion_matrix(all_new_targets_race, all_new_outputs_race, )
-    
+    # classification_report_race = metrics.classification_report(all_new_targets_race, all_new_outputs_race, target_names=
+    # mask_race_label_name_list,
+    #                                                       digits=4, output_dict=True)
+    classification_report_race = get_classification_report_with_acc_from_confusion_map(conf_m_race, mask_race_label_name_list)
 
     results = {
         'report': classification_report,
@@ -190,9 +223,8 @@ def read_socres(file_path, conf_m_title):
           report = a['report']
           # print(a.item().keys())
           
-          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
-          for mask_label in mask_label_list:
-              del report.item()[mask_label]['support']
+          df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
+          for mask_label in mask_label_name_list:
               for kk in report.item()[mask_label].keys():
                 df_arr[kk].append(report.item()[mask_label][kk])
           df = pd.DataFrame(data=df_arr, index=five_label_display_name)
@@ -210,16 +242,15 @@ def read_socres_gen(file_path, conf_m_title):
           report = a['report_gen']
           # print(a.item().keys())
           
-          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
-          for gen_label in mask_gen_label_list:
-              del report.item()[gen_label]['support']
+          df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
+          for gen_label in mask_gen_label_name_list:
               for kk in report.item()[gen_label].keys():
                 df_arr[kk].append(report.item()[gen_label][kk])
                 
           bias = []
-          for i in range(len(df_arr['f1-score'])):
+          for i in range(len(df_arr['accuary'])):
             if i % 2 != 0:
-              bias.append(df_arr['f1-score'][i] - df_arr['f1-score'][i - 1])
+              bias.append(df_arr['accuary'][i] - df_arr['accuary'][i - 1])
             else:
               bias.append(' ')
               
@@ -240,16 +271,15 @@ def read_socres_race(file_path, conf_m_title):
           report = a['report_race']
           # print(a.item().keys())
           
-          df_arr = {'precision': [], 'recall': [], 'f1-score': []}
-          for race_label in mask_race_label_list:
-              del report.item()[race_label]['support']
+          df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
+          for race_label in mask_race_label_name_list:
               for kk in report.item()[race_label].keys():
                 df_arr[kk].append(report.item()[race_label][kk])
           
           bias = []
-          for i in range(len(df_arr['f1-score'])):
+          for i in range(len(df_arr['accuary'])):
             if i % 2 != 0:
-              bias.append(df_arr['f1-score'][i] - df_arr['f1-score'][i - 1])
+              bias.append(df_arr['accuary'][i] - df_arr['accuary'][i - 1])
             else:
               bias.append(' ')
               
