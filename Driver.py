@@ -58,9 +58,16 @@ if __name__ == '__main__':
         elif flag == '-t':
             print('train the Base_CNN model')
             if len(sys.argv) > 2:
-                Training.train_final_model(Models.Base_CNN, 'Final_Model', sys.argv[2], num_epochs=30)
+                Training.train_final_model(Models.Base_CNN, 'Final_Model', sys.argv[2], num_epochs=50)
             else:
-                Training.train_final_model(Models.Base_CNN, 'Final_Model', num_epochs=30)
+                Training.train_final_model(Models.Base_CNN, 'Final_Model', num_epochs=50)
+
+        elif flag == '-t2':
+            print('train the Base_CNN_Part2 model')
+            if len(sys.argv) > 2:
+                Training.train_final_model(Models.Base_CNN_Part2, 'Final_Model', sys.argv[2], num_epochs=30)
+            else:
+                Training.train_final_model(Models.Base_CNN_Part2, 'Final_Model', num_epochs=30)
         
         elif flag == '-test_all':
             if len(sys.argv) > 2:
