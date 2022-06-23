@@ -169,11 +169,12 @@ class Base_CNN_Part2(torch.nn.Module):
         for i in range(0, len(self.layers)):
             x = self.layers[i](x)
         x = x.view(N, -1)
-        x = self.dropout1(x)
+
+        #x = self.dropout1(x)
         x = self.linear1(x)
         x = self.relu1(x)
 
-        x = self.dropout2(x)
+        #x = self.dropout2(x)
         x = self.linear2(x)
         x = self.relu2(x)
 
