@@ -192,6 +192,7 @@ def train_model(model, data_loader, x_val=None, y_val=None, num_epochs=50, lr=1e
         plt.title("Training and Testing accuracy curves")
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
+        plt.legend()
         plt.show()
         print("training accs:", train_accs)
         print("testing accs:", test_accs)

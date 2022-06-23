@@ -19,7 +19,7 @@ def load_and_preprocess_img(img_path, resize=128):
     return transform(image)
 
 
-def application_mode(model_type, model_path,img_path):
+def application_mode(model_type, model_path, img_path):
     model = Training.load_model(model_type,model_path)
     img = load_and_preprocess_img(img_path)
     plt.imshow(img.permute(1,2,0))

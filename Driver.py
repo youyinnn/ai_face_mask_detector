@@ -37,7 +37,7 @@ import sys
 
 #Training.load_and_run_model(Models.Less_Pooling_CNN, 'Final_Model_Less_Pooling')
 
-#Training.train_net(Models.Base_CNN_Part2, tuning=False, num_epochs=30, splits=10, dataset_path='./data/aug_2')
+Training.train_net(Models.Base_CNN_Part2, tuning=True, num_epochs=30, splits=10, dataset_path='./data/aug_2')
 
 
 if __name__ == '__main__':
@@ -72,6 +72,8 @@ if __name__ == '__main__':
         elif flag == '-test_all':
             if len(sys.argv) > 2:
                 Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', sys.argv[2])
+                Application.application_mode_imageset(Models.Base_CNN_Part2, 'Final_Model_Base_CNN', sys.argv[2])
             else:
                 Application.application_mode_imageset(Models.Base_CNN, 'Final_Model_Base_CNN', './data/test_data/')
+                Application.application_mode_imageset(Models.Base_CNN_Part2, 'Final_Model_Base_CNN', './data/test_data/')
             

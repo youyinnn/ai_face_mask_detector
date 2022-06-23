@@ -119,6 +119,8 @@ class AlexNet(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+
+
 class Base_CNN_Part2(torch.nn.Module):
     def __init__(self):
         super(Base_CNN_Part2, self).__init__()
@@ -151,9 +153,12 @@ class Base_CNN_Part2(torch.nn.Module):
         self.layers += [nn.Conv2d(192, 192, kernel_size=3),
                         nn.ReLU(inplace=True)]
 
+        self.dropout1 = nn.Dropout()
+        self.dropout2 = nn.Dropout()
         self.linear1 = nn.LazyLinear(256)
+        self.relu1 = nn.ReLU(inplace=True)
         self.linear2 = nn.Linear(256, 256)
-
+        self.relu2 = nn.ReLU(inplace=True)
         self.fc = nn.LazyLinear(5)
 
     def forward(self, x):
@@ -164,8 +169,14 @@ class Base_CNN_Part2(torch.nn.Module):
         for i in range(0, len(self.layers)):
             x = self.layers[i](x)
         x = x.view(N, -1)
+        x = self.dropout1(x)
         x = self.linear1(x)
+        x = self.relu1(x)
+
+        x = self.dropout2(x)
         x = self.linear2(x)
+        x = self.relu2(x)
+
         x = self.fc(x)
         # x = torch.softmax(x,dim=1)
         return x
