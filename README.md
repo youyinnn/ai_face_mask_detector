@@ -18,6 +18,18 @@
 │   │   ├── n95_mask
 │   │   ├── no_face_mask
 │   │   ├── surgical_mask
+│   ├── aug_2                                   # dataset for project part 2
+│   │   ├── cloth_mask                          
+│   │   ├── mask_worn_incorrectly
+│   │   ├── n95_mask
+│   │   ├── no_face_mask
+│   │   ├── surgical_mask
+│   ├── aug_3                                   # dataset for project part 2 for the bias
+│   │   ├── cloth_mask                          
+│   │   ├── mask_worn_incorrectly
+│   │   ├── n95_mask
+│   │   ├── no_face_mask
+│   │   ├── surgical_mask
 │   ├── test_data                               # dataset for small testing
 │   │   ├──   .
 │   │   ├──   .
@@ -66,7 +78,19 @@ python Driver.py -p ./data/aug_1/mask_worn_incorrectly/4_00001_aug_2.jpeg
 For training the `Models.Base_CNN`, you can run `Driver.py` with flag `-t` and specifying the dataset path:
 
 ``` bash
-python Driver.py -t ./data/aug_1 
+python Driver.py -t ./data/aug_2 
+```
+
+For training the `Models.Base_CNN_Part2`, you can run `Driver.py` with flag `-t2` and specifying the dataset path:
+
+``` bash
+python Driver.py -t2 ./data/aug_2 
+```
+
+For training the `Models.Base_CNN_Part2` with the rebalanced dataset, you can run `Driver.py` with flag `-t2` and specifying the dataset path as aug_3:
+
+``` bash
+python Driver.py -t2 ./data/aug_3 
 ```
 
 This will train the whole new `Base_CNN` model.
@@ -131,6 +155,9 @@ Then you can run the notebook file `model_evaluation_data.ipynb` to visualize th
 
 Then you can run the notebook file `model_evaluation_data.ipynb` to visualize the scores.
 
+#### 4.3 Visualise the Bias Scores
+
+Run the notebook files: `model_evaluation_data_bias_before.ipynb` and 'model_evaluation_data_bias_after.ipynb'
 
 <!-- Dataset:
 (Datasource)
