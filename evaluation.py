@@ -225,7 +225,7 @@ def read_socres(file_path, conf_m_title):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
           report = a['report']
-          report_sk = a['report_sk']
+          report_sk = a['report_sk'].item()
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
           for mask_label in mask_label_name_list:
