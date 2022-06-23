@@ -219,13 +219,12 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label', fontsize=12)  #x axis label
     plt.show()
 
-def read_socres(file_path, conf_m_title):
+def read_socres(file_path, conf_m_title, show_cm = True):
     print(file_path)
     if os.path.exists(file_path):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
           report = a['report']
-          report_sk = a['report_sk'].item()
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
           for mask_label in mask_label_name_list:
@@ -237,17 +236,22 @@ def read_socres(file_path, conf_m_title):
           df_arr['f1-score'].append(' ')
           df_arr['accuary'].append(' ')
           
-          df_arr['precision'].append(report_sk['weighted avg']['precision'])
-          df_arr['recall'].append(report_sk['weighted avg']['recall'])
-          df_arr['f1-score'].append(report_sk['weighted avg']['f1-score'])
-          df_arr['accuary'].append(' ')
-          
-          df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' ', 'weighted avg'])
+          if a.get('report_sk') != None:
+            report_sk = a['report_sk'].item()
+            df_arr['precision'].append(report_sk['weighted avg']['precision'])
+            df_arr['recall'].append(report_sk['weighted avg']['recall'])
+            df_arr['f1-score'].append(report_sk['weighted avg']['f1-score'])
+            df_arr['accuary'].append(' ')
+            df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' ', 'weighted avg'])
+          else:
+            df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' '])
           
           print(df)
           
           print('Overall acc: ', a['acc'])
-          plot_confusion_matrix(a['conf_m'], classes=five_label_display_name, title=conf_m_title)
+          
+          if show_cm:
+            plot_confusion_matrix(a['conf_m'], classes=five_label_display_name, title=conf_m_title)
           
 def read_socres_gen(file_path, conf_m_title):
     print(file_path)
