@@ -144,34 +144,37 @@ def evaluate(test_loader, model,
     f1 = f1_score(all_targets, all_outputs, average=f1_average)
     conf_m = confusion_matrix(all_targets, all_outputs, )
 
-    # classification_report = metrics.classification_report(all_targets, all_outputs, target_names=
-    # mask_label_name_list,
-    #                                                       digits=4, output_dict=True)
+    classification_report_sk = metrics.classification_report(all_targets, all_outputs, target_names=
+    mask_label_name_list,
+                                                          digits=4, output_dict=True)
     
     classification_report = get_classification_report_with_acc_from_confusion_map(conf_m, mask_label_name_list)
 
     conf_m_gen = confusion_matrix(all_new_targets_gen, all_new_outputs_gen, )
-    # classification_report_gen = metrics.classification_report(all_new_targets_gen, all_new_outputs_gen, target_names=
-    # mask_gen_label_name_list,
-    #                                                       digits=4, output_dict=True)
+    classification_report_gen_sk = metrics.classification_report(all_new_targets_gen, all_new_outputs_gen, target_names=
+    mask_gen_label_name_list,
+                                                          digits=4, output_dict=True)
     classification_report_gen = get_classification_report_with_acc_from_confusion_map(conf_m_gen, mask_gen_label_name_list)
     
     conf_m_race = confusion_matrix(all_new_targets_race, all_new_outputs_race, )
-    # classification_report_race = metrics.classification_report(all_new_targets_race, all_new_outputs_race, target_names=
-    # mask_race_label_name_list,
-    #                                                       digits=4, output_dict=True)
+    classification_report_race_sk = metrics.classification_report(all_new_targets_race, all_new_outputs_race, target_names=
+    mask_race_label_name_list,
+                                                          digits=4, output_dict=True)
     classification_report_race = get_classification_report_with_acc_from_confusion_map(conf_m_race, mask_race_label_name_list)
 
     results = {
         'report': classification_report,
+        'report_sk': classification_report_sk,
         'acc': acc,
         'pre': pre,
         'rec': rec,
         'f1': f1,
         'conf_m': conf_m,
         'report_gen': classification_report_gen,
+        'report_gen_sk': classification_report_gen_sk,
         'conf_m_gen': conf_m_gen,
         'report_race': classification_report_race,
+        'report_race_sk': classification_report_race_sk,
         'conf_m_race': conf_m_race,
     }
     #print("THE REPORT:")
@@ -222,13 +225,24 @@ def read_socres(file_path, conf_m_title):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
           report = a['report']
-          # print(a.item().keys())
+          report_sk = a['report_sk']
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
           for mask_label in mask_label_name_list:
               for kk in report.item()[mask_label].keys():
                 df_arr[kk].append(report.item()[mask_label][kk])
-          df = pd.DataFrame(data=df_arr, index=five_label_display_name)
+          
+          df_arr['precision'].append(' ')
+          df_arr['recall'].append(' ')
+          df_arr['f1-score'].append(' ')
+          df_arr['accuary'].append(' ')
+          
+          df_arr['precision'].append(report_sk['weighted avg']['precision'])
+          df_arr['recall'].append(report_sk['weighted avg']['recall'])
+          df_arr['f1-score'].append(report_sk['weighted avg']['f1-score'])
+          df_arr['accuary'].append(' ')
+          
+          df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' ', 'weighted avg'])
           
           print(df)
           
@@ -241,7 +255,7 @@ def read_socres_gen(file_path, conf_m_title):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
           report = a['report_gen']
-          # print(a.item().keys())
+          report_sk = a['report_gen_sk'].item()
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
           for gen_label in mask_gen_label_name_list:
@@ -256,8 +270,20 @@ def read_socres_gen(file_path, conf_m_title):
               bias.append(' ')
               
           df_arr['bias(fm - m)'] = bias
+                    
+          df_arr['precision'].append(' ')
+          df_arr['recall'].append(' ')
+          df_arr['f1-score'].append(' ')
+          df_arr['accuary'].append(' ')
+          df_arr['bias(fm - m)'].append(' ')
+          
+          df_arr['precision'].append(report_sk['weighted avg']['precision'])
+          df_arr['recall'].append(report_sk['weighted avg']['recall'])
+          df_arr['f1-score'].append(report_sk['weighted avg']['f1-score'])
+          df_arr['bias(fm - m)'].append(' ')
+          df_arr['accuary'].append(' ')
                 
-          df = pd.DataFrame(data=df_arr, index=gen_label_display_name)
+          df = pd.DataFrame(data=df_arr, index=[*gen_label_display_name, ' ', 'weighted avg'])
           
           print(df)
           print('Overall acc: ', a['acc'])
@@ -270,7 +296,8 @@ def read_socres_race(file_path, conf_m_title):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
           report = a['report_race']
-          # print(a.item().keys())
+          report_sk = a['report_race_sk'].item()
+          
           
           df_arr = {'precision': [], 'recall': [], 'f1-score': [], 'accuary': []}
           for race_label in mask_race_label_name_list:
@@ -285,7 +312,20 @@ def read_socres_race(file_path, conf_m_title):
               bias.append(' ')
               
           df_arr['bias(afar - caas)'] = bias
-          df = pd.DataFrame(data=df_arr, index=race_label_display_name)
+          
+          df_arr['precision'].append(' ')
+          df_arr['recall'].append(' ')
+          df_arr['f1-score'].append(' ')
+          df_arr['accuary'].append(' ')
+          df_arr['bias(afar - caas)'].append(' ')
+          
+          df_arr['precision'].append(report_sk['weighted avg']['precision'])
+          df_arr['recall'].append(report_sk['weighted avg']['recall'])
+          df_arr['f1-score'].append(report_sk['weighted avg']['f1-score'])
+          df_arr['bias(afar - caas)'].append(' ')
+          df_arr['accuary'].append(' ')
+          
+          df = pd.DataFrame(data=df_arr, index=[*race_label_display_name, ' ', 'weighted avg'])
           
           print(df)
           print('Overall acc: ', a['acc'])
