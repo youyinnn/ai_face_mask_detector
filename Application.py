@@ -12,6 +12,7 @@ label_map = {
     4: 'mask_worn_incorrectly',
 }
 
+
 def load_and_preprocess_img(img_path, resize=128):
     transform = T.Compose([T.Resize((resize, resize))])
     image = read_image(img_path)
@@ -20,9 +21,9 @@ def load_and_preprocess_img(img_path, resize=128):
 
 
 def application_mode(model_type, model_path, img_path):
-    model = Training.load_model(model_type,model_path)
+    model = Training.load_model(model_type, model_path)
     img = load_and_preprocess_img(img_path)
-    plt.imshow(img.permute(1,2,0))
+    plt.imshow(img.permute(1, 2, 0))
     img = img.float().reshape((1, img.shape[0], img.shape[1], img.shape[2]))
     prediction = model(img).argmax()
     plt.title("Prediction: "+label_map[prediction.item()])
@@ -31,7 +32,7 @@ def application_mode(model_type, model_path, img_path):
     print("Prediction: ", label_map[prediction.item()])
 
 
-def application_mode_imageset(model_type,model_path, file_path='./data/test_data/' ):
+def application_mode_imageset(model_type, model_path, file_path='./data/test_data/'):
     if torch.cuda.is_available():
         # print("Using GPU!")
         device = 'cuda'
@@ -41,7 +42,7 @@ def application_mode_imageset(model_type,model_path, file_path='./data/test_data
     X, y = Training.get_all_data(128, file_path=file_path)
     #X = X.to(device)
     #y = y.to(device)
-    model = Training.load_model(model_type,model_path).to(device)
-    results = Training.eval_model(model,X,y)
+    model = Training.load_model(model_type, model_path).to(device)
+    results = Training.eval_model(model, X, y)
     print(results)
     return results
