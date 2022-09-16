@@ -219,8 +219,10 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label', fontsize=12)  #x axis label
     plt.show()
 
-def read_socres(file_path, conf_m_title, show_cm = True):
-    print(file_path)
+
+def read_socres(file_path, conf_m_title, show_cm=True, printing=True):
+    if printing:
+        print(file_path)
     if os.path.exists(file_path):
       with open(file_path, 'rb') as f:
           a = np.load(f, allow_pickle=True)
@@ -245,14 +247,17 @@ def read_socres(file_path, conf_m_title, show_cm = True):
             df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' ', 'weighted avg'])
           else:
             df = pd.DataFrame(data=df_arr, index=[*five_label_display_name, ' '])
+          if printing:
+            print(df)
           
-          print(df)
-          
-          print('Overall acc: ', a['acc'])
+            print('Overall acc: ', a['acc'])
           
           if show_cm:
             plot_confusion_matrix(a['conf_m'], classes=five_label_display_name, title=conf_m_title)
-          
+    #print('hello')
+    return df
+
+
 def read_socres_gen(file_path, conf_m_title):
     print(file_path)
     if os.path.exists(file_path):
@@ -292,6 +297,8 @@ def read_socres_gen(file_path, conf_m_title):
           print(df)
           print('Overall acc: ', a['acc'])
           plot_confusion_matrix(a['conf_m_gen'], classes=gen_label_display_name, title=conf_m_title)
+          return a['conf_m_gen']
+
 
 
 def read_socres_race(file_path, conf_m_title):
